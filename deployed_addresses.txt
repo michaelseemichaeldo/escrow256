@@ -1,0 +1,2 @@
+Project includes a file called deployed_addresses.txt that describes where the deployed testnet contracts live (which testnet and address) *
+

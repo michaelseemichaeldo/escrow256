@@ -1,0 +1,120 @@
+{
+background-color: #f3f3f3   ;
+}
+
+header {
+    background-color: #fff;
+    width: 100%;
+    height: 100px;
+}
+
+header .header-brand {
+    font-family: Catamaran;
+    font-size: 48px;
+    font-weight: 900;
+    color: #111;
+    text-transform: uppercase;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    padding: 20px 0;
+}
+
+header nav ul {
+    margin: 0 auto;
+    display: block;
+}
+
+header nav ul li {
+    display: inline-block;
+    float: right;
+    list-style: none;
+    padding: 0 16px;
+}
+
+header nav ul li a  {
+    font-family: Catamaran;
+    font-size: 16px;
+    color: #111;
+}
+
+header .header-cases {
+    display: none;
+}
+
+.index-banner {
+    width: 100%;
+    height: calc(100vh-100px);
+    background-image: url('img/banner.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.index-banner h2 {
+    font-family: Catamaran;
+    font-size: 48px;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    text-shadow: 2px 2px 8px #111;
+}
+.index-banner h1 {
+    font-family: Cormorant Garamond;
+    font-size: 24px;
+    font-weight: 100;
+    font-style:italic;
+    line-height: 34px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 2px 2px 8px #111;
+}
+
+.index-boxlink-rectangle {
+    margin: auto;
+    width: 320px;
+    height: 100px;
+    background-color: #f2f2f2;
+
+}
+
+.index-links div h3 {
+    font-family: Catamaran;
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 100px;
+    color:#111;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+footer {
+    width: calc(100%-80px);
+    margin-top:20px;
+    padding: 40px 40px;
+    background-color:rgb(208, 221, 240);
+    overflow: hidden;
+}
+
+footer ul li {
+    display: block;
+    list-style: none;
+}
+
+footer ul li a{
+    font-family: Catamaran;
+    font-size: 16px;
+    color: #111;
+    line-height:
+}
+
+footer-sm {
+    width: 60px;
+    float: right;
+
+}
+
+footer-sm img {
+    width: 100%;
+    margin-bottom: 10px;
+}

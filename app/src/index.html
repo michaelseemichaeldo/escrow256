@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="sticky-footer.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="index.js"></script>
+    <title>Escrow Contract</title>
+  </head>
+
+  <body>
+      <nav class="navbar navbar-expand-lg navbar-inverse bg-dark">
+        <a class="navbar-brand" href="index.html">Escrow256 </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>  
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="http://escrow256.com/howitworks.html">How it works <span class="sr-only">(current)</span></a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <style>
+        .navbar-inverse .navbar-brand{
+        color: white;
+        }
+        .navbar-inverse .nav-link{
+        color: white;
+        }
+      </style>
+
+      <!--<div class="container"> -->
+          <br>
+          <br>
+          <br>
+          <br>
+          <div class="container">
+            <div class="jumbotron text-center">
+              <h1 class="display-4">Escrow256</h1>
+              <p class="lead">Secure easy to use Escrow service for crypto assets</p> 
+              <hr class="my-3"> 
+              <p>Click the respective button to send your digital assets to the escrow contract:</p>
+
+              Note: Do not send directly from an exchange, you have to be in control of your private keys in order to receive ether and ERC20Tokens respectively upon completion of transaction. 
+              <br><br>
+ 
+              <div class="alert alert-secondary" role="alert">
+              Your connected with account: <span id="account"></span>
+              </div>
+            <br>
+              <button type="button"  class="btn btn-success" data-toggle="modal" data-target="#createEscrowModal">
+                Create Escrow  
+              </button>
+            <br><br>
+              <div>
+              <span id="status"></span>
+              </div>
+             
+               <!--Button for CreateEscrow Modal -->
+ 
+              <!--start CreateEscrow Modal -->
+                <div class="modal fade" id="createEscrowModal" tabindex="-1" role="dialog" aria-labelledby="createEscrowLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">                          
+                          <h5 class="modal-title" id="createEscrowLabel">Create escrow for digital assets</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                        <br>
+                          <form>                    
+                            <div class="form-group" > 
+
+                            </div>      
+                            <div class="form-group" > 
+                              <label for="buyer">Buyer's Address</label>
+                              <input type="text" class="form-control" id="buyer" placeholder="Buyer's address">
+                            </div>
+                   
+                            <div class="form-group" > 
+                              <label for="token">Token Contract's Address</label>
+                              <input type="text" class="form-control" id="token" placeholder="Token Contract's Address">
+                            </div> 
+                          </form>
+                        </div>
+
+                      <div class="modal-footer">
+                        <button type="button" onclick="App.createEscrowContract()" data-dismiss="modal" class="btn btn-primary">Create</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      </div>
+                      </div>
+                    </div>
+                </div>        
+                <!-- End Send Modal -->
+
+                <!--Buttons for testing purposes:
+                    <button type="button" onclick="App.getEscrowId()" data-dismiss="modal" class="btn btn-primary">EscrowId</button>
+                    <button type="button" onclick="App.getEtherBalance()" data-dismiss="modal" class="btn btn-primary">EtherBalance</button>
+                    <button type="button" onclick="App.getTokenSellerBalance()" data-dismiss="modal" class="btn btn-primary">TokenSellerBalance</button>
+                    <button type="button" onclick="App.getEscrowState()" data-dismiss="modal" class="btn btn-primary">EscrowEstate</button>
+                    <button type="button" onclick="App.increaseEscrowId()" data-dismiss="modal" class="btn btn-primary">Increase EscrowId</button>
+                    <button type="button" onclick="App.cancelTransaction()" data-dismiss="modal" class="btn btn-primary">Cancel Transaction</button>
+                    <button type="button" onclick="App.completeTransaction()" data-dismiss="modal" class="btn btn-primary">Complete Transaction</button> -->
+
+                <!--start EtherSend Modal -->
+                <div class="modal fade" id="sendModal" tabindex="-1" role="dialog" aria-labelledby="sendModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">                          
+                          <h5 class="modal-title" id="sendModalLabel">Send your digital asset for lockup in the Escrow256 Contract</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                        <br>
+                          <form>
+                            <div class="form-group" > 
+                              <label for="etherAmount">Amount of Ether to be paid:   </label>
+                              <input type="text" class="form-control" id="etherAmount" placeholder="Amount of Ether to be paid">
+                            </div>
+                            <div class="form-group" > 
+                              <label for="escrowIdEther">Escrow Id  </label>
+                              <input type="text" class="form-control" id="escrowIdEther" placeholder="Escrow Id">
+                            </div>
+                          </form>
+                        </div>
+
+                      <div class="modal-footer">
+                        <button type="button" onclick="App.sendEther()" data-dismiss="modal" class="btn btn-primary">Send</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      </div>
+                      </div>
+                    </div>
+                </div>        
+                <!-- End Send Modal -->
+       
+                <!-- Start sendToken  Modal -->
+                <div class="modal fade" id="sendTokenModal" tabindex="-1" role="dialog" aria-labelledby="sendTokenModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">                          
+                        <h5 class="modal-title" id="sendTokenModalLabel">Send your digital asset for lockup in the Escrow256 Contract</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                      </div>
+                      <div class="modal-body">
+                      <br>
+                        <form>
+                          <div class="form-group" > 
+                            <label for="tokenAmount">Amount of Tokens to be paid:   </label>
+                            <input type="text" class="form-control" id="tokenAmount" placeholder="Amount of Tokens to be sold">
+                          </div>
+                           <div class="form-group" > 
+                            <label for="tokenAddress">Address of Token Contract:   </label>
+                            <input type="text" class="form-control" id="tokenContract" placeholder="Token Contract Address">
+                          </div>
+                          <div class="form-group" > 
+                            <label for="escrowIdToken">Escrow Id</label>
+                            <input type="text" class="form-control" id="escrowIdToken" placeholder="Escrow Id">
+                          </div>
+                        </form>
+                      </div>
+                    <div class="modal-footer">
+                      <button type="button" onclick="App.sendToken()" data-dismiss="modal" class="btn btn-primary">Send</button>
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                    </div>
+                  </div>
+              </div>         
+              <!--end sendToken Modal--> 
+
+                       <!-- Start approveToken  Modal -->
+               <div class="modal fade" id="approveTokenModal" tabindex="-1" role="dialog" aria-labelledby="approveTokenModalLabel" aria-hidden="true">
+               <div class="modal-dialog" role="document">
+                     <div class="modal-content">
+                     <div class="modal-header">                          
+                        <h5 class="modal-title" id="approveTokenModalLabel">Approve your digital asset for lockup in the Escrow256 Contract</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                        </button>
+                     </div>
+                     <div class="modal-body">
+                     <br>
+                        <form>
+                        <div class="form-group" > 
+                           <label for="approveTokenAmount">Amount of Tokens to be approved:   </label>
+                           <input type="text" class="form-control" id="approveTokenAmount" placeholder="Amount of Tokens to be sold">
+                        </div>
+                        <div class="form-group" > 
+                           <label for="escrowIdTokenApproval">Escrow Id</label>
+                           <input type="text" class="form-control" id="escrowIdTokenApproval" placeholder="Escrow Id">
+                        </div>
+                        <div class="form-group" > 
+                           <label for="tokenAddressTokenApproval">Token Contract Address</label>
+                           <input type="text" class="form-control" id="tokenAddressTokenApproval" placeholder="Token Contract Address">
+                        </div>
+                        </form>
+                     </div>
+                     <div class="modal-footer">
+                        <button type="button" onclick="App.approveTokenDeposit()" data-dismiss="modal" class="btn btn-primary">Send</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                     </div>
+                     </div>
+               </div>
+               </div>    
+
+                <!--end tokenTransfer Modal--> 
+                <br><br>
+
+                <!--start Show Escrow Details--> 
+                <div class="alert alert-secondary" role="alert">
+
+                  <form>
+                    <div class="form-row align-items-center justify-content-center">
+                      <div class="col-auto">
+                        <br>
+                        <label class="sr-only" for="inlineFormInput">Escrow Id</label>
+                        <input type="text" class="form-control mb-2" id="inlineFormInput" placeholder="Enter Escrow Id">
+                      </div>
+                    </div>
+                  </form>
+
+                  <div class="col-auto">
+                    <button type="submit" onclick="App.displayEscrow()" class="btn btn-secondary mb-2">Display Escrow</button>
+                  </div>
+        
+                  <br> Escrow Id:  <span id="escrowId"></span> <span class="black">  </span> <span class="badge badge-secondary"></span>
+                  <br> Ether balance:  <span id="displayEtherAmount"></span> <span class="black"> Ether</span> 
+                  <br> Token balance:  <span id="displayTokenAmount"></span> <span class="black"> Token</span>  
+                  <br> Escrow state:   <span id="escrowState"></span> <span class="black"> </span> 
+                  <br> Seller address:  <span id="sellerAddress"></span> <span class="black"> </span>  
+                  <br> Buyer address:   <span id="buyerAddress"></span> <span class="black"> </span> 
+                  <!-- <br> TokenContract balance: <span id="tokenContractBalance"></span> <span class="black"> </span>  -->
+
+                  <br><br>
+                      <div >      
+                            <!--Button for Send Modal -->                            
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#sendModal">
+                              Send Ether  
+                            </button>
+
+                            <!-- Button for sendToken  Modal -->
+                            <button type="button"  class="btn btn-danger" data-toggle="modal" data-target="#sendTokenModal">
+                              Send Token
+                            </button>
+                            <br></br>
+                            <p> When you agree with the balances in the escrow, please click confirm: </p>
+
+                            <button type="button" onclick="App.confirmation()" data-dismiss="modal" class="btn btn-success">Confirm</button>
+                            <p > When both parties have confirmed and the escrow state has changed to READY_TO_COMPLETE_TRANSFER, you can click on Complete Transaction to transfer the balances to the respective parties. If you would like to cancel and receive you tokens / ether back, please click cancel: </p>
+                          
+                            <button type="button" onclick="App.completeTransaction()" data-dismiss="modal" class="btn btn-dark">Complete Transaction</button>
+
+                            <button type="button" onclick="App.cancelTransaction()" data-dismiss="modal" class="btn btn-secondary">Cancel Transaction</button>
+            
+                          <!-- <button type="button" onclick="App.getTokenContractBalance()" data-dismiss="modal" class="btn btn-secondary">get Token Balance</button> -->
+                      </div>    
+                </div>
+                <!--end Show Escrow Balance-->
+
+                </div>> 
+                <br><br>
+          </div>
+
+    <!-- Footer -->
+  <footer class="container-fluid text-center footer">
+    <div class="row">
+      <div class="col-sm-12">
+        <br><br>
+        <h3 style="color:white;"> Disclaimer   </h3>
+           <p style="color:white;"> The Escrow256 decentralized application is an Alpha release and as a result may contain some bugs. By using the Escrow256 dApp users acknowledge this and accept that Escrow256 does not take any responsibility for lost funds or any other kind of direct or indirect damages or loss. For full disclaimer <a href="disclaimer.html">click here.</a></p>
+        <br><br>
+        <h3 style="color:white;">Contact Us</h3>
+        <h6 style="color:white;">email: <a href="mailto:info@escrow256.com">info@escrow256.com</a></h6> 
+        <br>
+      </div>
+
+      <div class="col-sm-12">
+          <h3 style="color:white;"> Follow Us</h3style="color:white;">
+          <a href="https://web.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://twitter.com/escrow256"><i class="fab fa-twitter"></i></a>
+      </div>
+    
+      <div class="col-sm-12 text-center" style="color:white;">
+        <br >
+    Copyright &copy; 2020. All rights reserved.
+    </div>
+    </div>
+    <style>
+      .footer {
+        clear: both;
+        position: relative;
+        width: 100%;
+        /* Set the fixed height of the footer here */
+        height: 390px;
+        background-color: rgb(43, 41, 41);
+        margin-top: -390;
+      }
+    </style>
+  </footer>
+  <!-- End Footer -->
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+</html>

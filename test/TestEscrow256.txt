@@ -1,0 +1,36 @@
+// pragma solidity >=0.4.21 <0.7.0;
+
+// import "truffle/Assert.sol";
+// import "truffle/DeployedAddresses.sol";
+// import "../contracts/Escrow256.sol";
+// import "../contracts/lib/ERC20.sol";
+
+// contract TestEscrow256 {
+    
+//     function testInitialBalanceUsingDeployedContract() public {
+//         Escrow256 escrow = Escrow256(DeployedAddresses.Escrow256());
+//         uint expected = 0;
+
+//         Assert.equal(
+//             escrow.balanceOf(msg.sender),
+//             expected,
+//             "Contract should have 0 balance initially"
+//         );
+//     }
+
+//     function escrowCreation() public {
+//         Escrow256 escrow = Escrow256(DeployedAddresses.Escrow256());
+//         uint expected = 1;
+        
+//         ERC20 _token = '0x5b0b7A8C24e6b87785d204eA4A36eb2310d3f998'; 
+//         address _buyer = '0x71330E77181D8FC7EFD6BFC6F29998af597a4064';
+//         address _tokenSeller = '0x399352171aD2eFFAd03f1b1512b08542853E7070';
+
+//         Assert.equal(
+//             escrow.createEscrowContract( _buyer,  _tokenSeller, _token),
+//             expected,
+//             "Creating Escrow should return integer of 1"
+//         );
+//     }
+
+// }
