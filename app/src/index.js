@@ -9,7 +9,7 @@ const App = {
   account: null,
   escrow: null,
   escrowId: null,
-  ERC20TokenContract: null,
+  //ERC20TokenContract: null,
 
   start: async function() {
     const { web3 } = this;
@@ -17,14 +17,19 @@ const App = {
     try {
       // get contract instance
       const networkId = await web3.eth.net.getId();
+      console.log(networkId)
+
       const deployedNetwork = escrow256Artifact.networks[networkId];
-      this.escrow = new web3.eth.Contract(
-        escrow256Artifact.abi, 
-        deployedNetwork.address
-      );
+      console.log(deployedNetwork)
+
+      this.escrow = new web3.eth.Contract(escrow256Artifact.abi, deployedNetwork.address);
+      console.log(this.escrow)
 
       const ERC20deployedNetwork = ERC20json.networks[networkId];
+      console.log(ERC20deployedNetwork)
+
       this.ERC20TokenContract =  new web3.eth.Contract(ERC20json.abi, ERC20deployedNetwork.address);
+      console.log(this.ERC20TokenContract)
 
       // get accounts
       const accounts = await web3.eth.getAccounts();
@@ -236,15 +241,16 @@ window.addEventListener("load", function() {
     // use MetaMask's provider
     App.web3 = new Web3(window.ethereum);
     window.ethereum.enable(); // get permission to access accounts
-  } else {
-    console.warn(
-      "No web3 detected. Falling back to http://127.0.0.1:7545. You should remove this fallback when you deploy live",
-    );
-    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    App.web3 = new Web3(
-      new Web3.providers.HttpProvider("http://127.0.0.1:7545"),
-    );
-  }
+  } 
+  //   else {
+  //   console.warn(
+  //     "No web3 detected. Falling back to http://127.0.0.1:7545. You should remove this fallback when you deploy live",
+  //   );
+  //   // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+  //   App.web3 = new Web3(
+  //     new Web3.providers.HttpProvider("http://127.0.0.1:7545"),
+  //   );
+  // }
 
   App.start();
 });

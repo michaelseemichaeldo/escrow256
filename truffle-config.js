@@ -18,11 +18,17 @@
  *
  */
 
+//require('dotenv').config();
 const HDWalletProvider = require("./app/node_modules/@truffle/hdwallet-provider");
-const MNEMONIC = ""
-// const HDWallet = require('truffle-hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
+//const HDWalletProvider = require("truffle-hdwallet-provider");
+//const HDWalletProvider = require("@truffle/hdwallet-provider");
+
+const mnemonic = "odor marble satisfy rough benefit real avocado keen poem blouse make bundle";
+ // const Mnemonic  = "aerobic barrel promote amount voice aim resemble save lunch way purchase matter";
+ // const INFURA_API_KEY = "5f103d85ed6741cca6c4f1ae4673183f"
+//const HDWallet = require('truffle-hdwallet-provider');
+//const infuraKey = "fj4jll3k.....";
+
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
@@ -60,7 +66,7 @@ module.exports = {
       //host: "127.0.0.1",
       //port: 7547   
       provider: function(){
-        return new HDWalletProvider(MNEMONIC, 'https://ropsten.infura.io/v3/50141d035ebd49fc94154d38f0ec2625')
+        return new HDWalletProvider(mnemonic , 'https://ropsten.infura.io/v3/5f103d85ed6741cca6c4f1ae4673183f')
       },
       gasPrice: 25000000000,
       network_id: 3
@@ -68,7 +74,7 @@ module.exports = {
 
     live: { 
       provider: function(){
-        return new HDWalletProvider(MNEMONIC, '')
+        return new HDWalletProvider(mnemonic , '')
       },
       network_id: 1,
       //host: "127.0.0.1",
