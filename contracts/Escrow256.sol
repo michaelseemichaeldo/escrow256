@@ -157,9 +157,11 @@ function completeTransaction(uint _escrowId) public {
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
         uint EtherBalance = Escrows[_escrowId].EtherBalance;
         tokenSeller.transfer(EtherBalance);
+
         address payable buyer = Escrows[_escrowId].buyer;
         uint TokenBalance = Escrows[_escrowId].TokenBalance;
         ERC20 Token = Escrows[_escrowId].Token;
+        
         Token.transfer(buyer, TokenBalance); //Causes issue!!
         Escrows[_escrowId].EtherBalance = 0; //reentrancy vulnerability
         Escrows[_escrowId].TokenBalance = 0;
