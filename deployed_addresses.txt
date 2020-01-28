@@ -1,2 +1,16 @@
 Project includes a file called deployed_addresses.txt that describes where the deployed testnet contracts live (which testnet and address) *
 
+Ropsten Testnet:
+
+Escrow256 contract: 0xB1F4D4D1DC58046d3C8E8bF3D15FCaC05671882e
+0x48442802cb1C9De3eeB7198B7108b57619abA590
+Owner:  
+0xF882383D50283E2C75ecB24F385e9Ce0A6f86aD7
+
+Buyer: 
+0x399352171aD2eFFAd03f1b1512b08542853E7070 
+
+
+ERC20 SimpleToken: 
+0x3D1F8EbD9Ec8835e3Bc795039A7C58fa7F8Ba729
+0x173F8f2EaaCf34020bb41cb308085250A021Fb52

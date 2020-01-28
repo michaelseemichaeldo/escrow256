@@ -1,35 +1,26 @@
 import Web3 from "web3";
 import ERC20json from "../../build/contracts/ERC20.json";
 import escrow256Artifact from "../../build/contracts/Escrow256.json";
-// using LibraryDemo.sol?
-
+import BN from "bn.js";
 
 const App = {
   web3: null,
   account: null,
   escrow: null,
   escrowId: null,
-  //ERC20TokenContract: null,
+
 
   start: async function() {
     const { web3 } = this;
-   
     try {
       // get contract instance
       const networkId = await web3.eth.net.getId();
-      console.log(networkId)
-
       const deployedNetwork = escrow256Artifact.networks[networkId];
-      console.log(deployedNetwork)
 
       this.escrow = new web3.eth.Contract(escrow256Artifact.abi, deployedNetwork.address);
-      console.log(this.escrow)
 
       const ERC20deployedNetwork = ERC20json.networks[networkId];
-      console.log(ERC20deployedNetwork)
-
       this.ERC20TokenContract =  new web3.eth.Contract(ERC20json.abi, ERC20deployedNetwork.address);
-      console.log(this.ERC20TokenContract)
 
       // get accounts
       const accounts = await web3.eth.getAccounts();
@@ -46,8 +37,13 @@ const App = {
     let buyerElement = document.getElementById('buyer').value
     let loggedInWithAccount = this.account
     let tokenAddress = document.getElementById('token').value
+    this.setStatus("Initiating transaction... (please wait)")
+
     this.escrowId = await createEscrowContract(buyerElement, loggedInWithAccount, tokenAddress).send({from: this.account})
-    this.setStatus("Escrow created! Id number: " + this.escrowId);
+
+    this.escrowId =  await this.getEscrowId()
+
+    this.setStatus("Escrow created! See Id number below");
   } catch (error) {
     this.setStatus("Error creating escrow! Open console in your browser for more details")
     console.log(error)
@@ -73,9 +69,11 @@ const App = {
   },
 
   getTokenSellerBalance: async function() {
+    const decimals = 18
+    const decimalsBN = new BN(decimals)
+    const divisor = new BN(10).pow(decimalsBN)
     let { getTokenSellerBalance } = this.escrow.methods
-    let tokenBalance = await getTokenSellerBalance(this.escrowId).call()
-    console.log(tokenBalance)
+    let tokenBalance = await getTokenSellerBalance(this.escrowId).call()/divisor
     let tokenBalanceElement = document.getElementById("displayTokenAmount")
     tokenBalanceElement.innerHTML = tokenBalance;
   },
@@ -164,23 +162,46 @@ const App = {
   // let escrowContractAddress = this.escrow.address
   
   sendToken: async function() {
-    let escrowContractAddress = '0xCD438905FD14429fE6135569677efE10DfF5B770'
-    let tokenAmount = document.getElementById("tokenAmount").value * Math.pow (10, 18)
+
+
+    //let BN = web3.utils.BN;
+     const decimals = 18
+     const decimalsBN = new BN(decimals)
+     const divisor = new BN(10).pow(decimalsBN)
+    
+
+    let escrowContractAddress = '0x48442802cb1C9De3eeB7198B7108b57619abA590'
+
+    let tokenAmount = (parseInt(document.getElementById("tokenAmount").value)  * divisor).toString() //  multiply with Math.pow (10, 18)? BigNumber?
+    // let tokenAmount2 = new BN(parseInt(document.getElementById("tokenAmount").value) ) 
+    // let tokenAmount3 = new BN(10).pow(decimalsBN)
+    // console.log(tokenAmount2.toString(), tokenAmount3.toString())
+    //const beforeDecimal = tokenAmount.div(divisor)
+    //const afterDecimal  = tokenAmount.mod(divisor)
+    
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
     let tokenContract = document.getElementById("tokenContract").value
-
+    
+    try{
+    //verify that seller has enough tokens before initiating transfer
     this.setStatus("Initiating transaction... (please wait)")
-    
     let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
-    let sendTokenBool = tokenContractInstance.transfer(escrowContractAddress, tokenAmount).send({from: this.account})
- 
-    console.log(sendTokenBool)
-    let { TokenSellerDeposit } = this.escrow.methods
-    let tokenBalance = await TokenSellerDeposit(tokenContract, tokenAmount, escrowId).send({ from: this.account, value: tokenAmount}) 
-    let tokenBalanceElement = document.getElementById("displayTokenAmount").value
-    tokenBalanceElement.innerHTML = tokenBalance;
-    
+    console.log(tokenContractInstance)
+    await tokenContractInstance.transfer(escrowContractAddress, tokenAmount).send({from: this.account})
     this.setStatus("Transaction complete!")
+    let { TokenSellerDeposit } = this.escrow.methods
+    let tokenBalance = (await TokenSellerDeposit(tokenAmount, 1).send({ from: this.account}))
+    let tokenBalanceElement = document.getElementById("displayTokenAmount").value
+    tokenBalanceElement.innerHTML = (tokenBalance).toFixed(2);
+    }
+
+    catch{
+    let { TokenSellerDeposit } = this.escrow.methods
+    let tokenBalance = await TokenSellerDeposit(tokenAmount, escrowId).send({ from: this.account})
+    let tokenBalanceElement = document.getElementById("displayTokenAmount").value
+    tokenBalanceElement.innerHTML = (tokenBalance).toFixed(2);
+    }
+
   },
 
   confirmation: async function() {
@@ -209,6 +230,9 @@ const App = {
     let { completeTransaction } = this.escrow.methods;
     await completeTransaction(this.escrowId).send({ from: this.account}) 
     this.setStatus("Transaction complete!")
+    let escrowStateElement = document.getElementById("escrowState")
+    escrowState.innerHTML = escrowStateElement;
+
   },
 
   getTokenContractBalance: async function() {
@@ -216,10 +240,12 @@ const App = {
     //let { getTokenContractBalance } = this.escrow.methods;
     //let tokenContractBalance = await getTokenContractBalance(this.escrowId).send({ from: this.account}) 
 
+
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
     let tokenContract = document.getElementById("tokenContract").value
     let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
     //this.setStatus(tokenContractBalance)
+    console.log(tokenContractInstance)
 
     this.setStatus("Initiating transaction... (please wait)")
     let tokenContractBalance = tokenContractInstance.balanceOf('0x3c901DD35d6576cB7Bd3B4f86bd2994F4fcA6b5B');
