@@ -100,6 +100,7 @@ const App = {
     await this.displayAccount() 
     await this.getBuyerAccount()
     await this.getSellerAccount()
+    //console.log(escrow256Artifact.address)
   },
 
   //This function returns the  the buyer's account
@@ -167,7 +168,9 @@ const App = {
     let decimals = 18
     let decimalsBN = new BN(decimals)
     let divisor = new BN(10).pow(decimalsBN)
-    let escrowContractAddress = '0x48442802cb1C9De3eeB7198B7108b57619abA590'
+    //let escrowContractAddress = escrow256Artifact.address
+    let escrowContractAddress = '0xA57e0a18f91f626bd30A505d484f194e9bEd2987'
+
     let tokenAmount = (parseInt(document.getElementById("tokenAmount").value)  * divisor).toString() //  multiply with Math.pow (10, 18)? BigNumber?
     // let tokenAmount2 = new BN(parseInt(document.getElementById("tokenAmount").value) ) 
     // let tokenAmount3 = new BN(10).pow(decimalsBN)
@@ -223,25 +226,29 @@ const App = {
 
   //This function sets "canceled" variable to true in the contract and updates the state of the escrow
   cancelTransaction: async function() {
+    this.escrowId = document.getElementById("inlineFormInput").value 
     let { cancelTransaction } = this.escrow.methods
     this.setStatus("Initiating cancellation... (please wait)")
-    await cancelTransaction(this.escrowId).send({ from: this.account}) 
-    let escrowState = await cancelTransaction(this.escrowId)
+    //await cancelTransaction(this.escrowId).send({ from: this.account}) 
+    let escrowState = await cancelTransaction(this.escrowId).send({ from: this.account}) 
     this.setStatus("Transaction canceled!")    
-    this.escrowId = document.getElementById("inlineFormInput").value 
     let escrowStateElement = document.getElementById("escrowState")
-    escrowState.innerHTML = escrowStateElement;
+    escrowStateElement.innerHTML = escrowState;
   },
 
   //This function sets "completed" variable to true in the contract and also updates the state of the escrow
   completeTransaction: async function() {
     this.escrowId = document.getElementById("inlineFormInput").value 
+    let { completeTransaction } = this.escrow.methods
+
     this.setStatus("Initiating transaction... (please wait)")
-    let { completeTransaction } = this.escrow.methods;
     await completeTransaction(this.escrowId).send({ from: this.account}) 
+    
+    //let escrowState = await completeTransaction(this.escrowId)
+
     this.setStatus("Transaction complete!")
     let escrowStateElement = document.getElementById("escrowState")
-    escrowState.innerHTML = escrowStateElement;
+    escrowStateElement.innerHTML = escrowState;
   },
 
   // getTokenContractBalance: async function() {

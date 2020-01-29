@@ -1,6 +1,7 @@
 pragma solidity  >=0.4.24 <0.7.0;
 
 import "./lib/ERC20.sol";
+import "./lib/SafeMath.sol";
 
 ///@title A smart contract acting as an escrow for ether and erc20 tokens
 /// @author Michael Candreia
@@ -11,6 +12,7 @@ contract Escrow256 is ERC20 {
     enum State{NULL, CREATED, BUYER_CONFIRMATION_OUTSTANDING, TOKENSELLER_CONFIRMATION_OUTSTANDING, READY_TO_COMPLETE_TRANSFER, CANCELED, COMPLETED}
     uint public EscrowId;
     address payable public owner;
+    bool public stopped = false;
     struct EscrowContract {
         address payable buyer;
         address payable tokenSeller;
@@ -40,9 +42,15 @@ constructor() public {
         owner = msg.sender;
     }
 
+/// @notice a modifier to control access to the destroyContract function
 modifier onlyOwner() {
     require (msg.sender == owner, "Only allowed by contract owner");
     _;
+}
+/// @notice a circuit breaker modifier to stop certain functions in case of a critical bug
+modifier stopInEmergency { 
+    require(!stopped); 
+    _; 
 }
 
 /// @notice This function will create an escrow contract and store the address of the caller as the seller. The address of the buyer and ERC20 token contract will be stored as provided as well. It will return a unique escrow Id.
@@ -109,7 +117,7 @@ function updateStatus(uint _escrowId) public {
 }
 
 /// @notice This function can be called by the buyer when sending ether. It updates the ether balance of the escrow with the respective Id.  
-function buyerDeposit(uint _escrowId) public payable {
+function buyerDeposit(uint _escrowId) public stopInEmergency payable {
     require(msg.sender == Escrows[_escrowId].buyer, "Does not match buyers address entered at creation of escrow");
     //require(msg.value >= 0 && msg.value <= 100 ether, "chose a value between 1 and 100 ether");
     Escrows[_escrowId].EtherBalance += msg.value;
@@ -117,7 +125,7 @@ function buyerDeposit(uint _escrowId) public payable {
 }
 
 /// @notice This function can be called by the seller when sending the erc20 token. It updates the token balance of the escrow with the respective Id.  
-function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public returns (uint) {
+function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public stopInEmergency returns (uint) {
     require(msg.sender == Escrows[_escrowId].tokenSeller, "Sender does not match sellers address entered at creation of escrow");
     require(!Escrows[_escrowId].canceled, "The escrow has been canceled by one of the parties and cannot be used anymore");
     require(!Escrows[_escrowId].completed, "The escrow transaction with this ID has already completed and cannot be used anymore");
@@ -128,7 +136,7 @@ function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public return
 }
 
 /// @notice This function sets the state of the escrow to to "CANCELED" and returns the respective balances to the buyer and seller. This function can be called by either party of the transaction.
-function cancelTransaction(uint _escrowId) public returns (bool) {
+function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool) {
         require((msg.sender == Escrows[_escrowId].buyer ) || (msg.sender == Escrows[_escrowId].tokenSeller), "Only buyer or seller account can cancel transaction");
         require (!Escrows[_escrowId].canceled);
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
@@ -136,11 +144,11 @@ function cancelTransaction(uint _escrowId) public returns (bool) {
         uint TokenBalance = Escrows[_escrowId].TokenBalance;
         uint EtherBalance = Escrows[_escrowId].EtherBalance;
         ERC20 Token = Escrows[_escrowId].Token;
-
-        //buyer.transfer(EtherBalance); //causes issue!
-        //Token.transfer(tokenSeller, TokenBalance); //causes issue!
-        Escrows[_escrowId].EtherBalance = 0; //reentrancy vulnerability
+        Escrows[_escrowId].EtherBalance = 0; 
         Escrows[_escrowId].TokenBalance = 0;
+        buyer.transfer(EtherBalance); 
+        Token.transfer(tokenSeller, TokenBalance); 
+    
         Escrows[_escrowId].canceled = true;
         Escrows[_escrowId].currentState = State.CANCELED;
         emit escrowCancellationEvent(Escrows[_escrowId].currentState);
@@ -148,27 +156,20 @@ function cancelTransaction(uint _escrowId) public returns (bool) {
 }
 
 /// @notice This function completes the exchange, sets the state of the escrow to to "COMPLETED" and transfers the respective balances to the buyer and seller. This function can be called by either party of the transaction.
-function completeTransaction(uint _escrowId) public {
-        // bool buyerConfirmation = Escrows[_escrowId].buyerConfirmation;
-        // bool tokenSellerConfirmation = Escrows[_escrowId].tokenSellerConfirmation; 
-        // require(buyerConfirmation && tokenSellerConfirmation, "Both buyer and seller need to confirm to complete transaction");
-        //require(!Escrows[_escrowId].canceled);
-        //require(Escrows[_escrowId].buyerConfirmation, "Both buyer and seller need to confirm to complete transaction");
-        //require(Escrows[_escrowId].tokenSellerConfirmation, "Both buyer and seller need to confirm to complete transaction");
-        //require(Escrows[_escrowId].currentState == State.READY_TO_COMPLETE_TRANSFER, "Both buyer and seller need to confirm to complete transaction");
+function completeTransaction(uint _escrowId) public stopInEmergency {
+        require(!Escrows[_escrowId].canceled, "Escrow got canceled");
+        require(Escrows[_escrowId].buyerConfirmation, "Both buyer and seller need to confirm to complete transaction");
+        require(Escrows[_escrowId].tokenSellerConfirmation, "Both buyer and seller need to confirm to complete transaction");
 
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
         uint EtherBalance = Escrows[_escrowId].EtherBalance;
-        tokenSeller.transfer(EtherBalance);
-
         address payable buyer = Escrows[_escrowId].buyer;
         uint TokenBalance = Escrows[_escrowId].TokenBalance;
-        ERC20 Token = Escrows[_escrowId].Token;
-        
-        Token.transfer(buyer, TokenBalance); //Causes issue!!
-        Escrows[_escrowId].EtherBalance = 0; //reentrancy vulnerability
+        Escrows[_escrowId].EtherBalance = 0; 
         Escrows[_escrowId].TokenBalance = 0;
-        //Escrows[_escrowId].currentState = State.COMPLETED;
+        ERC20 Token = Escrows[_escrowId].Token;
+        tokenSeller.transfer(EtherBalance);
+        Token.transfer(buyer, TokenBalance); 
         Escrows[_escrowId].completed = true;
         this.updateStatus(_escrowId);
         emit completeTransactionEvent(Escrows[_escrowId].EtherBalance, Escrows[_escrowId].currentState);
@@ -216,6 +217,14 @@ function getSellerAccountAddress(uint _escrowId) public view returns (address) {
         return Escrows[_escrowId].tokenSeller;
 }
 
+/// @notice change the bool stopped to true for the circuit breaker modifier used to stop certain functions in case of a critical bug
+function stopContract() public onlyOwner {
+        stopped = true;
+    }
+/// @notice change the bool stopped to false for the circuit breaker modifier used to stop certain functions in case of a critical bug
+function resumeContract() public onlyOwner {
+        stopped = false;
+}
 
 /// @notice This function destroys this smart contract can only be called by the owner, i.e. the address from which this contract has initially been deployed. This function allows the owner to kill the contract if there are serious issues with it and redeploy it after fixing the issue. The function will only be there during the beta phase and will be removed eventually in the final version.
 function destroyContract() public onlyOwner{
