@@ -34,6 +34,7 @@ event buyerConfirmationEvent(address buyer, State currentState, uint EtherBalanc
 event tokenSellerConfirmationEvent(address tokenSeller, State currentState, uint TokenBalance);
 event updatedStatusEvent(State currentState);
 event completeTransactionEvent(uint etherBalance, State currentState);
+event escrowCancellationEvent(State currentState);
 
 constructor() public {
         owner = msg.sender;
@@ -127,21 +128,23 @@ function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public return
 }
 
 /// @notice This function sets the state of the escrow to to "CANCELED" and returns the respective balances to the buyer and seller. This function can be called by either party of the transaction.
-function cancelTransaction(uint _escrowId) public {
+function cancelTransaction(uint _escrowId) public returns (bool) {
         require((msg.sender == Escrows[_escrowId].buyer ) || (msg.sender == Escrows[_escrowId].tokenSeller), "Only buyer or seller account can cancel transaction");
         require (!Escrows[_escrowId].canceled);
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
         address payable buyer = Escrows[_escrowId].buyer;
         uint TokenBalance = Escrows[_escrowId].TokenBalance;
         uint EtherBalance = Escrows[_escrowId].EtherBalance;
-        ERC20 Token =Escrows[_escrowId].Token;
+        ERC20 Token = Escrows[_escrowId].Token;
 
-        buyer.transfer(EtherBalance); //causes issue!
-        Token.transfer(tokenSeller, TokenBalance); //causes issue!
+        //buyer.transfer(EtherBalance); //causes issue!
+        //Token.transfer(tokenSeller, TokenBalance); //causes issue!
         Escrows[_escrowId].EtherBalance = 0; //reentrancy vulnerability
         Escrows[_escrowId].TokenBalance = 0;
         Escrows[_escrowId].canceled = true;
         Escrows[_escrowId].currentState = State.CANCELED;
+        emit escrowCancellationEvent(Escrows[_escrowId].currentState);
+        return Escrows[_escrowId].canceled;
 }
 
 /// @notice This function completes the exchange, sets the state of the escrow to to "COMPLETED" and transfers the respective balances to the buyer and seller. This function can be called by either party of the transaction.
@@ -212,6 +215,7 @@ function getBuyerAccountAddress(uint _escrowId) public view returns (address) {
 function getSellerAccountAddress(uint _escrowId) public view returns (address) {
         return Escrows[_escrowId].tokenSeller;
 }
+
 
 /// @notice This function destroys this smart contract can only be called by the owner, i.e. the address from which this contract has initially been deployed. This function allows the owner to kill the contract if there are serious issues with it and redeploy it after fixing the issue. The function will only be there during the beta phase and will be removed eventually in the final version.
 function destroyContract() public onlyOwner{

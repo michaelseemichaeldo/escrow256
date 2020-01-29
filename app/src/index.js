@@ -176,8 +176,6 @@ const App = {
     //const afterDecimal  = tokenAmount.mod(divisor)
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
     let tokenContract = document.getElementById("tokenContract").value
-
-
     
     try{
     //verify that seller has enough tokens before initiating transfer
