@@ -21,3 +21,13 @@ The Escrow256 dApp is a simple contract to escrow ERC20 tokens and ether.
 5. Once both buyer and seller have clicked the confirm button, the smart contract will update the state of the respective escrow, upon which the exchange of the token and ether will be completed.
 
 
+In order to build and run the frontend code LOCALLY:
+
+1. Run have npm (run npm install)
+2. Make sure you have ganache running
+3. "truffle compile" to create the json contract artifacts
+4. "truffle migrate --reset --network development" to deploy the contracts onto the network ("development" will deploy locally to ganache)
+5. write down the escrow contract's address and copy it into the front end to assign it to the escrowContract variable.
+6. "npm run build" to compile the javascript and html assets into the build folder
+7. "npm run dev" to serve the assets in the build folder
+8. go to the host and port that truffle is serving (default is localhost:8080) in order to see the served assets

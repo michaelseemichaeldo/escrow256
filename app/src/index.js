@@ -62,11 +62,15 @@ const App = {
 
   //This function returns the ether balance of the escrow with the provided escrow id 
   getEtherBalance: async function() {
+    let decimals = 18
+    let decimalsBN = new BN(decimals)
+    let divisor = new BN(10).pow(decimalsBN)
+
     let { getEtherBalance } = this.escrow.methods
     let etherBalance = await getEtherBalance(this.escrowId).call()
     console.log(etherBalance)
     let etherBalanceElement = document.getElementById("displayEtherAmount")
-    etherBalanceElement.innerHTML = etherBalance/1000000000000000000;
+    etherBalanceElement.innerHTML = etherBalance/divisor;
   },
 
   //This function returns the token balance of the escrow with the provided escrow id 

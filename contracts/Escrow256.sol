@@ -120,7 +120,7 @@ function updateStatus(uint _escrowId) public {
 function buyerDeposit(uint _escrowId) public stopInEmergency payable {
     require(msg.sender == Escrows[_escrowId].buyer, "Does not match buyers address entered at creation of escrow");
     //require(msg.value >= 0 && msg.value <= 100 ether, "chose a value between 1 and 100 ether");
-    Escrows[_escrowId].EtherBalance += msg.value;
+    Escrows[_escrowId].EtherBalance = add(Escrows[_escrowId].EtherBalance, msg.value);
     emit buyerDepositEvent(msg.value);
 }
 
@@ -129,7 +129,7 @@ function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public stopIn
     require(msg.sender == Escrows[_escrowId].tokenSeller, "Sender does not match sellers address entered at creation of escrow");
     require(!Escrows[_escrowId].canceled, "The escrow has been canceled by one of the parties and cannot be used anymore");
     require(!Escrows[_escrowId].completed, "The escrow transaction with this ID has already completed and cannot be used anymore");
-    Escrows[_escrowId].TokenBalance = Escrows[_escrowId].TokenBalance + _numberOfTokens;
+    Escrows[_escrowId].TokenBalance = add(Escrows[_escrowId].TokenBalance, _numberOfTokens);
     emit sellerDepositEvent(Escrows[_escrowId].TokenBalance);
     uint TokenBalance = Escrows[_escrowId].TokenBalance;
     return TokenBalance;

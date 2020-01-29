@@ -2,11 +2,11 @@
 
 # Mortal design pattern 
 
-Implemented mortal design pattern to destroy a contract if need be using the selfdestruct keyword in the destroyContract() function.
+Escrow256.sol implements the mortal design pattern to destroy a contract if need be using the selfdestruct keyword in the destroyContract() function.
 
 # Withdrawal Pattern
 
-Implemented withdrawal pattern protects against re-entrancy and denial of service attacks. The function logic is separated. The TokenSellerDeposit() and buyerDeposit functions handle the accounting of the amounts sent with the transaction. Another function, completeTransaction(), allows accounts to transfer their balance from the contract to their account.
+The withdrawal pattern was implemented to protect against re-entrancy and denial of service attacks. The function logic is separated. The TokenSellerDeposit() and buyerDeposit functions handle the accounting of the amounts sent with the transaction. Other functions, like completeTransaction or cancelTransaction, allows accounts to transfer their balance from the contract to the user's account.
 
 # State Machine
 
