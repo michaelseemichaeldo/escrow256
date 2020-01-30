@@ -189,6 +189,14 @@ function getTokenSellerBalance(uint _escrowId) public view returns (uint) {
         return Escrows[_escrowId].TokenBalance;
 }
 
+function validateTokenSellerBalance(uint _escrowId, ERC20 _TokenContractAddress, uint tokenAmount) public view returns (uint) {
+        address seller = Escrows[_escrowId].tokenSeller;
+        ERC20 TokenContractAddress = _TokenContractAddress;
+        uint tokenBalance = TokenContractAddress.balanceOf(seller);
+        //bool validateSufficiency = tokenBalance > tokenAmount;
+        return tokenBalance;
+}
+
 /// @notice This function calls the "getEscrowStateString" function to return the State of the escrow in question 
 function getEscrowState(uint _escrowId) public view returns (string memory) {
         return getEscrowStateString(_escrowId);

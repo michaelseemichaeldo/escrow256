@@ -67,7 +67,6 @@ const App = {
     let divisor = new BN(10).pow(decimalsBN)
     let { getEtherBalance } = this.escrow.methods
     let etherBalance = await getEtherBalance(this.escrowId).call()
-    console.log(etherBalance)
     let etherBalanceElement = document.getElementById("displayEtherAmount")
     etherBalanceElement.innerHTML = etherBalance/divisor;
   },
@@ -171,7 +170,7 @@ const App = {
     let decimalsBN = new BN(decimals)
     let multiplier = new BN(10).pow(decimalsBN)
     //let escrowContractAddress = escrow256Artifact.address
-    let escrowContractAddress = '0xd5faB7A2B20aA782083C2B705e598FD5f6493305'
+    let escrowContractAddress = '0xf8B4A6C40DB24eFF86EA8F8994e29ed9125Aea6d'
 
     let tokenAmount = parseInt(document.getElementById("tokenAmount").value) 
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
@@ -179,6 +178,8 @@ const App = {
     
     try{
     //verify that seller has enough tokens before initiating transfer
+    let { validateTokenSellerBalance } = this.escrow.methods
+
       this.setStatus("Initiating transaction... (please wait)")
       let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
       // tokenInstance.balanceOf.call("0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41", {from: "0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41"});
@@ -187,7 +188,16 @@ const App = {
       // if(tokenBalanceOfSeller<tokenAmount){
       //   this.setStatus("not enough tokens")
       // }
+      let totalTokenBalance = await validateTokenSellerBalance(escrowId, tokenContract, tokenAmount).call()
+      console.log(totalTokenBalance.toString())
+      this.setStatus("checking Token Balance!")
+
+      if ((totalTokenBalance/multiplier) < tokenAmount) {
+        this.setStatus("insufficient Token Balance!")
+      }
+      else{
       await tokenContractInstance.transfer(escrowContractAddress, tokenAmount * multiplier).send({from: this.account})
+    }
      // this.setStatus("Transaction complete!")
       //let { TokenSellerDeposit } = this.escrow.methods
       //await TokenSellerDeposit(tokenAmount, escrowId).send({ from: this.account})
@@ -196,7 +206,7 @@ const App = {
     catch{
       this.setStatus("Confirm transaction on Metamask... Open browser console if there is no Metamask notification for more info.")
       let { TokenSellerDeposit } = this.escrow.methods
-      await TokenSellerDeposit((tokenAmount), this.escrowId).send({ from: this.account})
+      await TokenSellerDeposit((tokenAmount), escrowId).send({ from: this.account})
       this.setStatus("Transaction complete!")
       
       
