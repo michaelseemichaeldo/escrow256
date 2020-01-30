@@ -122,7 +122,6 @@ function updateStatus(uint _escrowId) public {
 /// @notice This function can be called by the buyer when sending ether. It updates the ether balance of the escrow with the respective Id.  
 function buyerDeposit(uint _escrowId) public stopInEmergency payable {
     require(msg.sender == Escrows[_escrowId].buyer, "Does not match buyers address entered at creation of escrow");
-    //require(msg.value >= 0 && msg.value <= 100 ether, "chose a value between 1 and 100 ether");
     Escrows[_escrowId].EtherBalance = Escrows[_escrowId].EtherBalance.add( msg.value);
     emit buyerDepositEvent(msg.value);
 }
@@ -132,7 +131,7 @@ function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public stopIn
     require(msg.sender == Escrows[_escrowId].tokenSeller, "Sender does not match sellers address entered at creation of escrow");
     require(!Escrows[_escrowId].canceled, "The escrow has been canceled by one of the parties and cannot be used anymore");
     require(!Escrows[_escrowId].completed, "The escrow transaction with this ID has already completed and cannot be used anymore");
-    //require(Escrows[_escrowId].Token.balanceOf( Escrows[_escrowId].tokenSeller)>= _numberOfTokens, "Not enough tokens");
+    //require(Escrows[_escrowId].Token.balanceOf( Escrows[_escrowId].tokenSeller)>= _numberOfTokens, "Not enough tokens"); //causes issues
     Escrows[_escrowId].TokenBalance = Escrows[_escrowId].TokenBalance.add( _numberOfTokens);
     emit sellerDepositEvent(Escrows[_escrowId].TokenBalance);
     uint TokenBalance = Escrows[_escrowId].TokenBalance;
@@ -143,7 +142,6 @@ function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public stopIn
 function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool) {
         require((msg.sender == Escrows[_escrowId].buyer ) || (msg.sender == Escrows[_escrowId].tokenSeller), "Only buyer or seller account can cancel transaction");
         require (Escrows[_escrowId].created, "Escrow with provided id has not been created");
-
         require (!Escrows[_escrowId].canceled, "The contract is already canceled");
         require (!Escrows[_escrowId].completed, "The contract is already completed");
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
@@ -153,10 +151,9 @@ function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool)
         ERC20 Token = Escrows[_escrowId].Token;
         Escrows[_escrowId].EtherBalance = 0; 
         Escrows[_escrowId].TokenBalance = 0;
+        Escrows[_escrowId].canceled = true;
         buyer.transfer(EtherBalance); 
         Token.transfer(tokenSeller, TokenBalance); 
-    
-        Escrows[_escrowId].canceled = true;
         Escrows[_escrowId].currentState = State.CANCELED;
         emit escrowCancellationEvent(Escrows[_escrowId].currentState);
         return Escrows[_escrowId].canceled;
@@ -167,18 +164,16 @@ function completeTransaction(uint _escrowId) public stopInEmergency {
         require(!Escrows[_escrowId].canceled, "Escrow is canceled.");
         require(Escrows[_escrowId].buyerConfirmation, "Both buyer and seller need to confirm to complete transaction");
         require(Escrows[_escrowId].tokenSellerConfirmation, "Both buyer and seller need to confirm to complete transaction");
-
-
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
         uint EtherBalance = Escrows[_escrowId].EtherBalance;
         address payable buyer = Escrows[_escrowId].buyer;
         uint TokenBalance = Escrows[_escrowId].TokenBalance;
         Escrows[_escrowId].EtherBalance = 0; 
         Escrows[_escrowId].TokenBalance = 0;
+        Escrows[_escrowId].completed = true;
         ERC20 Token = Escrows[_escrowId].Token;
         tokenSeller.transfer(EtherBalance);
         Token.transfer(buyer, TokenBalance); 
-        Escrows[_escrowId].completed = true;
         this.updateStatus(_escrowId);
         emit completeTransactionEvent(Escrows[_escrowId].EtherBalance, Escrows[_escrowId].currentState);
 }
