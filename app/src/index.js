@@ -173,7 +173,7 @@ const App = {
     let decimalsBN = new BN(decimals)
     let divisor = new BN(10).pow(decimalsBN)
     //let escrowContractAddress = escrow256Artifact.address
-    let escrowContractAddress = '0xA57e0a18f91f626bd30A505d484f194e9bEd2987'
+    let escrowContractAddress = '0xCD438905FD14429fE6135569677efE10DfF5B770'
 
     let tokenAmount = (parseInt(document.getElementById("tokenAmount").value)  * divisor).toString() //  multiply with Math.pow (10, 18)? BigNumber?
     // let tokenAmount2 = new BN(parseInt(document.getElementById("tokenAmount").value) ) 
@@ -217,6 +217,7 @@ const App = {
 
   //This function sets the confirmation variable to true in the contract and updates the state of the escrow
   confirmation: async function() {
+    try{
     this.escrowId = document.getElementById("inlineFormInput").value 
     let { confirmTransaction } = this.escrow.methods
     //let confirmation = await confirmTransaction(this.escrowId).send({ from: this.account})
@@ -226,10 +227,17 @@ const App = {
     let escrowStateElement = document.getElementById("escrowState")
     escrowStateElement.innerHTML = escrowState;
     console.log(escrowState)
+  }
+    catch (error) {
+      this.setStatus("Error! Open browser console for more details")
+      console.log(error)
+  }
   },
 
   //This function sets "canceled" variable to true in the contract and updates the state of the escrow
   cancelTransaction: async function() {
+    try{
+
     this.escrowId = document.getElementById("inlineFormInput").value 
     let { cancelTransaction } = this.escrow.methods
     this.setStatus("Initiating cancellation... (please wait)")
@@ -238,10 +246,17 @@ const App = {
     this.setStatus("Transaction canceled!")    
     let escrowStateElement = document.getElementById("escrowState")
     escrowStateElement.innerHTML = escrowState;
+  }
+  catch (error) {
+    this.setStatus("Error! Open browser console for more details")
+    console.log(error)
+}
   },
 
   //This function sets "completed" variable to true in the contract and also updates the state of the escrow
   completeTransaction: async function() {
+    try{
+
     this.escrowId = document.getElementById("inlineFormInput").value 
     let { completeTransaction } = this.escrow.methods
 
@@ -253,6 +268,11 @@ const App = {
     this.setStatus("Transaction complete!")
     let escrowStateElement = document.getElementById("escrowState")
     escrowStateElement.innerHTML = escrowState;
+    }
+    catch (error) {
+      this.setStatus("Error! Open browser console for more details")
+      console.log(error)
+  }
   },
 
   // getTokenContractBalance: async function() {
