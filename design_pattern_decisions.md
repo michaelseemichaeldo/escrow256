@@ -6,7 +6,7 @@ Escrow256.sol implements the mortal design pattern to destroy a contract if need
 
 # Withdrawal Pattern
 
-The withdrawal pattern was implemented to protect against re-entrancy and denial of service attacks. The function logic is separated. The TokenSellerDeposit() and buyerDeposit functions handle the accounting of the amounts sent with the transaction. Other functions, like completeTransaction or cancelTransaction, allows accounts to transfer their balance from the contract to the user's account.
+The withdrawal pattern was implemented partially to protect against re-entrancy and denial of service attacks. The function logic is partially separated. The TokenSellerDeposit() and buyerDeposit()functions handle the accounting of the amounts sent with the transaction. Other functions, like completeTransaction or cancelTransaction, handle both accounting and external calls, which is why the checks-effects-interactions pattern has been implemented as well as a mutex, and the state has been updated before making external calls (see avoiding_common_attacks.md for more info)
 
 # State Machine
 

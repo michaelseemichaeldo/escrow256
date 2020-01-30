@@ -23,7 +23,7 @@ const HDWalletProvider = require("./app/node_modules/@truffle/hdwallet-provider"
 //const HDWalletProvider = require("truffle-hdwallet-provider");
 //const HDWalletProvider = require("@truffle/hdwallet-provider");
 
-const mnemonic = "odor marble satisfy rough benefit real avocado keen poem blouse make bundle";
+const mnemonic = "odor marble satisfy rough benefit real avocado keen poem blouse make bundle"; // will be moved to dotenv file and added to .gitignore before deploying contract to livenet
  // const Mnemonic  = "aerobic barrel promote amount voice aim resemble save lunch way purchase matter";
  // const INFURA_API_KEY = "5f103d85ed6741cca6c4f1ae4673183f"
 //const HDWallet = require('truffle-hdwallet-provider');

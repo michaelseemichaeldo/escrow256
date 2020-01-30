@@ -21,6 +21,7 @@ contract Escrow256 is ERC20 {
         bool tokenSellerConfirmation;
         bool canceled;
         bool completed;
+        bool created;
         ERC20 Token;
         uint TokenBalance;
         uint EtherBalance;
@@ -60,10 +61,11 @@ function createEscrowContract(address payable _buyer, address payable _tokenSell
     bool _tokenSellerConfirmation = false;
     bool _canceled = false;
     bool _completed = false;
+    bool _created = true;
     uint _tokenBalance = 0;
     uint _etherBalance = 0;
     State _currentState = State.CREATED;
-    Escrows[EscrowId] = EscrowContract(_buyer, _tokenSeller, _currentState, _tokenSellerConfirmation, _buyerConfirmation, _canceled, _completed, _token, _tokenBalance, _etherBalance, EscrowId);
+    Escrows[EscrowId] = EscrowContract(_buyer, _tokenSeller, _currentState, _tokenSellerConfirmation, _buyerConfirmation, _canceled, _completed, _created, _token, _tokenBalance, _etherBalance, EscrowId);
     emit EscrowContractCreated(EscrowId, _buyer, _tokenSeller);
     return EscrowId;
 }
@@ -71,6 +73,7 @@ function createEscrowContract(address payable _buyer, address payable _tokenSell
 /// @notice This function can be called by either of the parties of the transaction when they agree with the balances displayed in the escrow and would like to go ahead with the exchange
 function confirmTransaction(uint _escrowId) public returns(string memory){
     require(msg.sender == Escrows[_escrowId].buyer || msg.sender == Escrows[_escrowId].tokenSeller);
+    require (Escrows[_escrowId].created, "Escrow with provided id has not been created");
 
     if (msg.sender == Escrows[_escrowId].buyer){
         this.buyerConfirmTransaction(_escrowId);
@@ -129,6 +132,7 @@ function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public stopIn
     require(msg.sender == Escrows[_escrowId].tokenSeller, "Sender does not match sellers address entered at creation of escrow");
     require(!Escrows[_escrowId].canceled, "The escrow has been canceled by one of the parties and cannot be used anymore");
     require(!Escrows[_escrowId].completed, "The escrow transaction with this ID has already completed and cannot be used anymore");
+    //require(Escrows[_escrowId].Token.balanceOf( Escrows[_escrowId].tokenSeller)>= _numberOfTokens, "Not enough tokens");
     Escrows[_escrowId].TokenBalance = Escrows[_escrowId].TokenBalance.add( _numberOfTokens);
     emit sellerDepositEvent(Escrows[_escrowId].TokenBalance);
     uint TokenBalance = Escrows[_escrowId].TokenBalance;
@@ -138,7 +142,10 @@ function TokenSellerDeposit( uint _numberOfTokens, uint _escrowId) public stopIn
 /// @notice This function sets the state of the escrow to to "CANCELED" and returns the respective balances to the buyer and seller. This function can be called by either party of the transaction.
 function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool) {
         require((msg.sender == Escrows[_escrowId].buyer ) || (msg.sender == Escrows[_escrowId].tokenSeller), "Only buyer or seller account can cancel transaction");
-        require (!Escrows[_escrowId].canceled);
+        require (Escrows[_escrowId].created, "Escrow with provided id has not been created");
+
+        require (!Escrows[_escrowId].canceled, "The contract is already canceled");
+        require (!Escrows[_escrowId].completed, "The contract is already completed");
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
         address payable buyer = Escrows[_escrowId].buyer;
         uint TokenBalance = Escrows[_escrowId].TokenBalance;
@@ -157,9 +164,10 @@ function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool)
 
 /// @notice This function completes the exchange, sets the state of the escrow to to "COMPLETED" and transfers the respective balances to the buyer and seller. This function can be called by either party of the transaction.
 function completeTransaction(uint _escrowId) public stopInEmergency {
-        require(!Escrows[_escrowId].canceled, "Escrow got canceled");
+        require(!Escrows[_escrowId].canceled, "Escrow is canceled.");
         require(Escrows[_escrowId].buyerConfirmation, "Both buyer and seller need to confirm to complete transaction");
         require(Escrows[_escrowId].tokenSellerConfirmation, "Both buyer and seller need to confirm to complete transaction");
+
 
         address payable tokenSeller = Escrows[_escrowId].tokenSeller;
         uint EtherBalance = Escrows[_escrowId].EtherBalance;

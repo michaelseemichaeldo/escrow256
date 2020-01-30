@@ -65,7 +65,6 @@ const App = {
     let decimals = 18
     let decimalsBN = new BN(decimals)
     let divisor = new BN(10).pow(decimalsBN)
-
     let { getEtherBalance } = this.escrow.methods
     let etherBalance = await getEtherBalance(this.escrowId).call()
     console.log(etherBalance)
@@ -79,7 +78,7 @@ const App = {
     const decimalsBN = new BN(decimals)
     const divisor = new BN(10).pow(decimalsBN)
     let { getTokenSellerBalance } = this.escrow.methods
-    let tokenBalance = await getTokenSellerBalance(this.escrowId).call()/divisor
+    let tokenBalance = await getTokenSellerBalance(this.escrowId).call()
     let tokenBalanceElement = document.getElementById("displayTokenAmount")
     tokenBalanceElement.innerHTML = tokenBalance;
   },
@@ -168,19 +167,13 @@ const App = {
   
   //This function sends the amount of tokens entered by the user to the buyer address entered by the user
   sendToken: async function() {
-    //let BN = web3.utils.BN;
     let decimals = 18
     let decimalsBN = new BN(decimals)
-    let divisor = new BN(10).pow(decimalsBN)
+    let multiplier = new BN(10).pow(decimalsBN)
     //let escrowContractAddress = escrow256Artifact.address
-    let escrowContractAddress = '0xCD438905FD14429fE6135569677efE10DfF5B770'
+    let escrowContractAddress = '0xd5faB7A2B20aA782083C2B705e598FD5f6493305'
 
-    let tokenAmount = (parseInt(document.getElementById("tokenAmount").value)  * divisor).toString() //  multiply with Math.pow (10, 18)? BigNumber?
-    // let tokenAmount2 = new BN(parseInt(document.getElementById("tokenAmount").value) ) 
-    // let tokenAmount3 = new BN(10).pow(decimalsBN)
-    // console.log(tokenAmount2.toString(), tokenAmount3.toString())
-    //const beforeDecimal = tokenAmount.div(divisor)
-    //const afterDecimal  = tokenAmount.mod(divisor)
+    let tokenAmount = parseInt(document.getElementById("tokenAmount").value) 
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
     let tokenContract = document.getElementById("tokenContract").value
     
@@ -188,29 +181,25 @@ const App = {
     //verify that seller has enough tokens before initiating transfer
       this.setStatus("Initiating transaction... (please wait)")
       let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
-      // let tokenContractBalanceSeller = tokenContractInstance.balanceOf(this.account)
-      // let balanceSufficient = tokenContractBalanceSeller > tokenAmount
-      // console.log(balanceSufficient)
-  
-      // let tokenBalanceOfSeller = await tokenContractInstance.balanceOf(this.account)
-      // console.log(tokenBalanceOfSeller)
+      // tokenInstance.balanceOf.call("0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41", {from: "0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41"});
+      // let tokenContractBalanceOfSeller = await tokenContractInstance.balanceOf(this.account)
+      // let tokenContractBalanceOfSeller = tokenContractInstance.balanceOf(this.account)
       // if(tokenBalanceOfSeller<tokenAmount){
       //   this.setStatus("not enough tokens")
       // }
-      
-      await tokenContractInstance.transfer(escrowContractAddress, tokenAmount).send({from: this.account})
-      this.setStatus("Transaction complete!")
-      let { TokenSellerDeposit } = this.escrow.methods
-      let tokenBalance = (await TokenSellerDeposit(tokenAmount, this.escrowId).send({ from: this.account}))
-      let tokenBalanceElement = document.getElementById("displayTokenAmount").value
-      tokenBalanceElement.innerHTML = tokenBalance;
+      await tokenContractInstance.transfer(escrowContractAddress, tokenAmount * multiplier).send({from: this.account})
+     // this.setStatus("Transaction complete!")
+      //let { TokenSellerDeposit } = this.escrow.methods
+      //await TokenSellerDeposit(tokenAmount, escrowId).send({ from: this.account})
     }
 
     catch{
+      this.setStatus("Confirm transaction on Metamask... Open browser console if there is no Metamask notification for more info.")
       let { TokenSellerDeposit } = this.escrow.methods
-      let tokenBalance = await TokenSellerDeposit(tokenAmount, escrowId).send({ from: this.account})
-      let tokenBalanceElement = document.getElementById("displayTokenAmount").value
-      tokenBalanceElement.innerHTML = tokenBalance;
+      await TokenSellerDeposit((tokenAmount), this.escrowId).send({ from: this.account})
+      this.setStatus("Transaction complete!")
+      
+      
     }
   },
 
@@ -241,7 +230,6 @@ const App = {
     this.escrowId = document.getElementById("inlineFormInput").value 
     let { cancelTransaction } = this.escrow.methods
     this.setStatus("Initiating cancellation... (please wait)")
-    //await cancelTransaction(this.escrowId).send({ from: this.account}) 
     let escrowState = await cancelTransaction(this.escrowId).send({ from: this.account}) 
     this.setStatus("Transaction canceled!")    
     let escrowStateElement = document.getElementById("escrowState")
@@ -263,8 +251,6 @@ const App = {
     this.setStatus("Initiating transaction... (please wait)")
     await completeTransaction(this.escrowId).send({ from: this.account}) 
     
-    //let escrowState = await completeTransaction(this.escrowId)
-
     this.setStatus("Transaction complete!")
     let escrowStateElement = document.getElementById("escrowState")
     escrowStateElement.innerHTML = escrowState;
@@ -275,18 +261,6 @@ const App = {
   }
   },
 
-  // getTokenContractBalance: async function() {
-  //   this.escrowId = document.getElementById("inlineFormInput").value 
-  //   //let { getTokenContractBalance } = this.escrow.methods;
-  //   //let tokenContractBalance = await getTokenContractBalance(this.escrowId).send({ from: this.account}) 
-  //   let escrowId = parseInt(document.getElementById("escrowIdToken").value)
-  //   let tokenContract = document.getElementById("tokenContract").value
-  //   let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
-  //   this.setStatus("Initiating transaction... (please wait)")
-  //   let tokenContractBalance = tokenContractInstance.balanceOf('0x3c901DD35d6576cB7Bd3B4f86bd2994F4fcA6b5B');
-  //   let tokenContractBalanceElement = document.getElementById("tokenContractBalance").value
-  //   tokenContractBalanceElement.innerHTML = tokenContractBalance;
-  // },
 
 //This function sets "canceled" variable to true in the contract and updates the state of the escrow
   setStatus: function(message) {

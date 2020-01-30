@@ -231,7 +231,7 @@ describe("CompleteTransaction", () => {
 
     it("completeTransaction should result in buyer's token balance of 100 at SimpleToken Contract", async() => {
         instance = await Escrow256.new()
-        instanceSimpleToken = await SimpleToken.new()
+    instanceSimpleToken = await SimpleToken.new()
     
        let simpleTokenAddress = instanceSimpleToken.address
        await instanceSimpleToken.transfer(instance.address, _numberOfTokens, {from: seller})
