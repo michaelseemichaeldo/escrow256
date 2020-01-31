@@ -1,4 +1,5 @@
-pragma solidity  >=0.4.24 <0.7.0;
+ pragma solidity  >=0.4.24 <0.7.0;
+
 
 import "./lib/ERC20.sol";
 import "./lib/SafeMath.sol";
@@ -190,7 +191,7 @@ function getTokenSellerBalance(uint _escrowId) public view returns (uint) {
 }
 
 /// @notice This function returns the total token balance of the seller to make sure the seller has enough tokens before transferring to the escrow contract
-function validateTokenSellerBalance(uint _escrowId, ERC20 _TokenContractAddress, uint tokenAmount) public view returns (uint) {
+function validateTokenSellerBalance(uint _escrowId, ERC20 _TokenContractAddress) public view returns (uint) {
         address seller = Escrows[_escrowId].tokenSeller;
         ERC20 TokenContractAddress = _TokenContractAddress;
         uint tokenBalance = TokenContractAddress.balanceOf(seller);

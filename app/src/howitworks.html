@@ -10,15 +10,16 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link href="sticky-footer.css" rel="stylesheet">
-    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/js/all.min.js"></script>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="index.js"></script>
+    <link href="app.css" rel="stylesheet">
+
     <title>Escrow Contract</title>
   </head>
 
-  <body>
+  <body  id="home" background= "iStock963459054.jpg">
       <nav class="navbar navbar-expand-lg navbar-inverse bg-dark">
         <a class="navbar-brand" href="index.html">Escrow256 </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,59 +48,81 @@
           <br>
           <br>
           <br>
+          <div >
           <div class="container">
             <div class="jumbotron text-center">
               <h1 class="display-4">How it works</h1>
-              <p class="lead">Coming soon...</p> 
+              <!-- <p class="lead">Coming soon...</p>  -->
               <hr class="my-3"> 
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer leo erat, accumsan eu laoreet sit amet, ullamcorper a quam. Cras gravida viverra lacus ut volutpat. Vestibulum congue tristique dui et tristique. Duis tristique neque ex, ac tristique sem euismod non. Curabitur tincidunt et risus et placerat. Nunc eleifend elit id sem mattis, ut sollicitudin nibh volutpat. Cras quis libero feugiat, placerat massa a, pretium nibh. Vivamus non nisl eu ligula consequat congue eget id quam. Suspendisse semper venenatis mi, at scelerisque justo pellentesque id. Suspendisse imperdiet eu justo ac pharetra. Praesent tortor felis, porttitor sit amet odio in, laoreet euismod sem. Sed in maximus lacus. Nunc pretium, urna a elementum dignissim, diam sapien porttitor magna, a rhoncus leo lorem quis neque. Cras sem ante, tempus vitae lorem ac, lobortis dictum est. Nam id nibh quis sapien elementum consequat. Fusce urna odio, pulvinar et consequat tempor, semper a dui.
+              <p style="text-align: left;">The Escrow256 dApp is a decentralised app built on <a href="https://ethereum.org/what-is-ethereum/">Ethereum</a> allowing you to escrow <a href="https://www.youtube.com/watch?v=g3IKJnInY4k">ERC20 tokens</a> and ether.
 
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur elementum tortor eget felis efficitur, id gravida neque fermentum. Integer turpis sapien, condimentum in consequat vel, auctor a orci. Quisque quam lectus, sollicitudin imperdiet tellus nec, cursus egestas purus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non euismod libero. Aliquam finibus cursus sapien nec blandit. In sed lacinia nisl. Sed facilisis risus non tristique maximus. Proin facilisis, urna vitae maximus blandit, felis neque convallis nisi, nec mattis est libero vel sem. Mauris pulvinar neque a tellus aliquam, sit amet faucibus leo vehicula. Proin ultrices dui at risus auctor, ac convallis quam faucibus. Aliquam finibus consequat dictum. Integer varius nunc et turpis efficitur, id venenatis libero rhoncus. Morbi id convallis tellus. Duis porta dui lorem, in venenatis quam iaculis in.</p>
-
+                It enables an ERC20 token  owner to sell their tokens for ether trustlessly. This app requires <a href="https://metamask.io/">Metamask</a> to transfer ether to the escrow smart contract. MetaMask is a web-based wallet that runs in your browser (Chrome, Firefox,
+                  Opera or Brave Browser). For more details on how to use Metamask please check out this <a href="https://www.youtube.com/watch?v=6Gf_kRE4MJU&feature=youtu.be"> video.</a> Do not send ether directly from an exchange (such as coinbase, binance or other). Using Metamask you can transfer funds to the escrow smart contract. The Escrow256 smart contract will exchange the funds to the respective address upon completion of the transaction, therefore you should only send from an address which you control the private keys.</p>
+                <a  href="https://metamask.io/"><img src="../img/metamask.png" alt="metamask" width="100"
+                  height="100"> </a>
+                  <br>
+               <p style="text-align: left;"> The steps to complete such a transaction are:</p>
+       
+               <ol style="text-align: left;">
+                
+               <li> The account owning the ERC20 token (seller) creates the escrow and receives a corresponding escrowId.</li>
+               
+               <li> The seller transfers the ownership of a preagreed amount of ERC20 token to the Escrow256 smart contract. The balance is stored in the EscrowMapping with the respective Id generated at escrow creation.</li>
+               
+               <li> The seller lets the buyer know that the escrow had been created and passes along the id number. Upon which the buyer of the ERC20 tokens deposits a preagreed amount of ether into the respective escrow contract. </li>
+               
+               <li> The buyer and seller can check the balances of the escrow with the respective Id and when they are satisfied with the locked up balances they can individually confirm by clicking the confirm button. If they do decide to not go through with the transaction, they can hit the cancel button instead.</li>
+               
+               <li> Once both buyer and seller have clicked the confirm button, the smart contract will update the state of the respective escrow, upon which either the buyer or seller can click on 'Complete Transaction', resulting in the exchange of the token and ether.</li>
+              </ol> 
+              <img src="../img/4.png" alt="escrow illustration" width="250"
+              height="200"><figcaption>
+                Placeholder illustration (from en.bit.news)
+                </figcaption>
+              </p>
               <br><br>
- 
-
-            </div>> 
+            </div>
             <br><br>
           </div>
 
-    <!-- Footer -->
-  <footer class="container-fluid text-center footer">
-    <div class="row">
-      <div class="col-sm-12">
-        <br><br>
-        <h3 style="color:white;"> Disclaimer   </h3>
-           <p style="color:white;"> The Escrow256 decentralized application is an Alpha release and as a result may contain some bugs. By using the Escrow256 dApp users acknowledge this and accept that Escrow256 does not take any responsibility for lost funds or any other kind of direct or indirect damages or loss. For full disclaimer <a href="disclaimer.html">click here.</a></p>
-        <br><br>
-        <h3 style="color:white;">Contact Us</h3>
-        <h6 style="color:white;">email: <a href="mailto:info@escrow256.com">info@escrow256.com</a></h6> 
-        <br>
-      </div>
+          <!-- Footer -->
+          <footer class="container-fluid text-center footer">
+            <div class="row">
+              <div class="col-sm-12">
+                <br><br>
+                <h3 style="color:white;"> Disclaimer   </h3>
+                  <p style="color:white;"> The Escrow256 decentralized application is an Alpha release and as a result may contain some bugs. By using the Escrow256 dApp users acknowledge this and accept that Escrow256 does not take any responsibility for lost funds or any other kind of direct or indirect damages or loss. For full disclaimer <a href="disclaimer.html">click here.</a></p>
+                <br><br>
+                <h3 style="color:white;">Contact Us</h3>
+                <h6 style="color:white;">email: <a href="mailto:info@escrow256.com">info@escrow256.com</a></h6> 
+                <br>
+              </div>
 
-      <div class="col-sm-12">
-          <h3 style="color:white;"> Follow Us</h3style="color:white;">
-          <a href="https://web.facebook.com/"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://twitter.com/escrow256"><i class="fab fa-twitter"></i></a>
-      </div>
-    
-      <div class="col-sm-12 text-center" style="color:white;">
-        <br >
-    Copyright &copy; 2020. All rights reserved.
-    </div>
-    </div>
-    <style>
-      .footer {
-        clear: both;
-        position: relative;
-        width: 100%;
-        /* Set the fixed height of the footer here */
-        height: 390px;
-        background-color: rgb(43, 41, 41);
-        margin-top: -390;
-      }
-    </style>
-  </footer>
-  <!-- End Footer -->
+              <div class="col-sm-12">
+                  <h3 style="color:white;"> Follow Us</h3style="color:white;">
+                  <a href="https://web.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+                  <a href="https://twitter.com/"><i class="fab fa-twitter"></i></a>
+              </div>
+            
+              <div class="col-sm-12 text-center" style="color:white;">
+                <br >
+            Copyright &copy; 2020. All rights reserved.
+            </div>
+            </div>
+          </div>
+            <style>
+              .footer {
+                clear: both;
+                position: relative;
+                width: 100%;
+                /* Set the fixed height of the footer here */
+                height: 390px;
+                background-color: rgb(43, 41, 41);
+                margin-top: -390;
+              }
+            </style>
+          </footer>
+          <!-- End Footer -->
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

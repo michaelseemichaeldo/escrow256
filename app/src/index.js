@@ -2,12 +2,19 @@ import Web3 from "web3";
 import ERC20json from "../../build/contracts/ERC20.json";
 import escrow256Artifact from "../../build/contracts/Escrow256.json";
 import BN from "bn.js";
+import ENS from "ethereum-ens";
+
+
 
 const App = {
   web3: null,
   account: null,
   escrow: null,
   escrowId: null,
+
+
+
+
 
   start: async function() {
     const { web3 } = this;
@@ -25,6 +32,7 @@ const App = {
       const accounts = await web3.eth.getAccounts();
       this.account = accounts[0];
       this.displayAccount()
+      
     } catch (error) {
       console.error("Could not connect to contract or chain.");
     }
@@ -32,6 +40,7 @@ const App = {
 
   // This function will create an escrow contract and store the address of the caller as the seller. The address of the buyer and ERC20 token contract will be stored as provided as well. It will return a unique escrow Id.
   createEscrowContract: async function() {
+    
     try {
       let { createEscrowContract } = this.escrow.methods
       let buyerElement = document.getElementById('buyer').value
@@ -41,6 +50,9 @@ const App = {
 
       this.escrowId = await createEscrowContract(buyerElement, loggedInWithAccount, tokenAddress).send({from: this.account})
       this.escrowId =  await this.getEscrowId()
+      await this.displayAccount() 
+      await this.getBuyerAccount()
+      await this.getSellerAccount()
 
       this.setStatus("Escrow created! See Id number below");
   } catch (error) {
@@ -115,10 +127,23 @@ const App = {
 
   //This function returns the seller's account
   getSellerAccount: async function () {
+    let ens = new ENS(ethereum);
+
     let { getSellerAccountAddress } = this.escrow.methods
     let sellerAccountAddress = await getSellerAccountAddress(this.escrowId).call()
+    
     let sellerAddressElement = document.getElementById("sellerAddress")
-    sellerAddressElement.innerHTML = sellerAccountAddress;
+    sellerAddressElement.innerHTML = sellerAccountAddress
+
+    let sellerENSAccountAddress = await ens.reverse(sellerAccountAddress).name()
+    
+    // Check to be sure the reverse record is correct.
+    if(sellerAccountAddress != await ens.resolver(sellerENSAccountAddress).addr()) {
+      sellerENSAccountAddress = null;
+    }
+
+    let sellerENSAddressElement = document.getElementById("sellerENSAddress")
+    sellerENSAddressElement.innerHTML = sellerENSAccountAddress
   },
 
   //This function returns the escrow Id
@@ -178,18 +203,12 @@ const App = {
     
     try{
     //verify that seller has enough tokens before initiating transfer
-    let { validateTokenSellerBalance } = this.escrow.methods
-
+      let { validateTokenSellerBalance } = this.escrow.methods
       this.setStatus("Initiating transaction... (please wait)")
       let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
       // tokenInstance.balanceOf.call("0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41", {from: "0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41"});
       // let tokenContractBalanceOfSeller = await tokenContractInstance.balanceOf(this.account)
-      // let tokenContractBalanceOfSeller = tokenContractInstance.balanceOf(this.account)
-      // if(tokenBalanceOfSeller<tokenAmount){
-      //   this.setStatus("not enough tokens")
-      // }
-      let totalTokenBalance = await validateTokenSellerBalance(escrowId, tokenContract, tokenAmount).call()
-      console.log(totalTokenBalance.toString())
+      let totalTokenBalance = await validateTokenSellerBalance(escrowId, tokenContract).call()
       this.setStatus("checking Token Balance!")
 
       if ((totalTokenBalance/multiplier) < tokenAmount) {
@@ -198,9 +217,6 @@ const App = {
       else{
       await tokenContractInstance.transfer(escrowContractAddress, tokenAmount * multiplier).send({from: this.account})
       }
-     // this.setStatus("Transaction complete!")
-      //let { TokenSellerDeposit } = this.escrow.methods
-      //await TokenSellerDeposit(tokenAmount, escrowId).send({ from: this.account})
     }
 
     catch{

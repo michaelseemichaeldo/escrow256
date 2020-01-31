@@ -20,8 +20,19 @@ There is no logic implemented that depends on the escrow contract's balance.
 
 #  exposed secrets
 
-Since this is only a test environment with no real ether, it was not considered an issue of making any mnemonics public. Of course once deployed on the mainnet no secrets should be uploaded to a public github space or made otherwises accessible publicly in the smart contract for example.
+There are no secrets stored in the contract. However, since this is only a test environment with no real ether, it was not considered an issue of sharing the mnemonics with any reviewers. Of course once deployed on the mainnet no secrets should be uploaded to a public github space or made otherwise publicly accessible in the smart contract for example.
 
 # security analysis tools
-Escrow256.sol was checked with https://tool.smartdec.net/.
+Escrow256.sol was checked with https://tool.smartdec.net/ and mythX, while there were warnings, there were no errors discovered.
 
+# powerful contract administrators
+While the contract currently has an owner in the alpha release on the ropsten testnet, the owner will be removed upon final deployment to the live net. When the owner is removed, it will be considered whether to implement an upgradable contract design pattern to allow for future upgrades.
+
+# traditional web security best practices
+Https will be implemented before the contract is deployed to the Mainnet.
+
+# cross chain replay attack
+Currently not a concern, but this possible attack is something to keep in mind in case of a hard fork.
+
+# gas limits
+Should not be an issue in the escrow256 smart contract, since no array are implemented nor are any strings stored from the users.
