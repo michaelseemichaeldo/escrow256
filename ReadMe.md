@@ -12,13 +12,14 @@ The Escrow256 dApp is a simple contract to escrow ERC20 tokens and ether.
 
 1. The account owning the ERC20 token (seller) creates the escrow and receives a corresponding escrowId.
 
-2. The seller transfers the ownership of a preagreed amount of ERC20 token to the Escrow256 smart contract. The balance is stored in the EscrowMapping with the respective Id generated at escrow creation.
+2. The seller transfers the ownership of a preagreed amount of ERC20 tokens to the escrow smart contract. The contract stores the balance of the escrow with the respective Id that is generated at escrow creation.
 
-3. The seller lets the buyer know that the escrow had been created and passes along the id number. Upon which the buyer of the ERC20 tokens deposits a preagreed amount of ether into the respective escrow contract. 
+3. The seller lets the buyer know that the escrow had been created and passes along the id number, upon which the buyer of the ERC20 tokens deposits a preagreed amount of ether into the respective escrow contract.
 
 4. The buyer and seller can check the balances of the escrow with the respective Id and when they are satisfied with the locked up balances they can individually confirm by clicking the confirm button. If they do decide to not go through with the transaction, they can hit the cancel button instead.
 
-5. Once both buyer and seller have clicked the confirm button, the smart contract will update the state of the respective escrow, upon which the exchange of the token and ether will be completed.
+5. Once both buyer and seller have clicked 'confirm Transaction', the smart contract will update the state of the respective escrow. The buyer or seller can then click 'Complete Transaction', after which the token and ether will be exchanged.
+
 
 
 In order to build and run the frontend code LOCALLY:
