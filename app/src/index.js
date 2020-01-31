@@ -170,7 +170,7 @@ const App = {
     let decimalsBN = new BN(decimals)
     let multiplier = new BN(10).pow(decimalsBN)
     //let escrowContractAddress = escrow256Artifact.address
-    let escrowContractAddress = '0xf8B4A6C40DB24eFF86EA8F8994e29ed9125Aea6d'
+    let escrowContractAddress = '0x880D7BB56d7433344A2a4A86e92c56d2f0cAB89e'
 
     let tokenAmount = parseInt(document.getElementById("tokenAmount").value) 
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
@@ -197,7 +197,7 @@ const App = {
       }
       else{
       await tokenContractInstance.transfer(escrowContractAddress, tokenAmount * multiplier).send({from: this.account})
-    }
+      }
      // this.setStatus("Transaction complete!")
       //let { TokenSellerDeposit } = this.escrow.methods
       //await TokenSellerDeposit(tokenAmount, escrowId).send({ from: this.account})

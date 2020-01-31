@@ -3,6 +3,7 @@ Project includes a file called deployed_addresses.txt that describes where the d
 Ropsten Testnet:
 
 Escrow256 contract (use last deployment): 
+fourth deployment: 0x880D7BB56d7433344A2a4A86e92c56d2f0cAB89e
 third deployment: 0xA57e0a18f91f626bd30A505d484f194e9bEd2987
 second deployment: 0x48442802cb1C9De3eeB7198B7108b57619abA590
 first deployment: 0xB1F4D4D1DC58046d3C8E8bF3D15FCaC05671882e
@@ -13,11 +14,11 @@ Owner:
 
 
 ERC20 SimpleToken: 
+fourth deployement: 0x7783AcAc0fb1b0a31E796bC742F17645b4fa2b40
 third deployment: 0x24c94692987C500cb0070bC41A249590cCBBC8F2
 second deployment: 0x173F8f2EaaCf34020bb41cb308085250A021Fb52
 first deployment: 0x3D1F8EbD9Ec8835e3Bc795039A7C58fa7F8Ba729
 
 Other notes:
 reset metamask account upon issues.
-refresh escrowId
 https://rinkeby.etherscan.io/verifyContract

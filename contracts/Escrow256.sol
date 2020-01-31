@@ -189,6 +189,7 @@ function getTokenSellerBalance(uint _escrowId) public view returns (uint) {
         return Escrows[_escrowId].TokenBalance;
 }
 
+/// @notice This function returns the total token balance of the seller to make sure the seller has enough tokens before transferring to the escrow contract
 function validateTokenSellerBalance(uint _escrowId, ERC20 _TokenContractAddress, uint tokenAmount) public view returns (uint) {
         address seller = Escrows[_escrowId].tokenSeller;
         ERC20 TokenContractAddress = _TokenContractAddress;
