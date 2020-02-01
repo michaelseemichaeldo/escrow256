@@ -2,9 +2,7 @@ import Web3 from "web3";
 import ERC20json from "../../build/contracts/ERC20.json";
 import escrow256Artifact from "../../build/contracts/Escrow256.json";
 import BN from "bn.js";
-import ENS from "ethereum-ens";
-
-
+import ENS from "ethereum-ens"; 
 
 const App = {
   web3: null,
@@ -12,15 +10,13 @@ const App = {
   escrow: null,
   escrowId: null,
 
-
-
-
-
   start: async function() {
     const { web3 } = this;
+
     try {
       // get contract instance
       const networkId = await web3.eth.net.getId();
+
       const deployedNetwork = escrow256Artifact.networks[networkId];
 
       this.escrow = new web3.eth.Contract(escrow256Artifact.abi, deployedNetwork.address);
@@ -39,26 +35,28 @@ const App = {
   },
 
   // This function will create an escrow contract and store the address of the caller as the seller. The address of the buyer and ERC20 token contract will be stored as provided as well. It will return a unique escrow Id.
-  createEscrowContract: async function() {
-    
+  createEscrowContract: async function() {    
     try {
       let { createEscrowContract } = this.escrow.methods
       let buyerElement = document.getElementById('buyer').value
       let loggedInWithAccount = this.account
       let tokenAddress = document.getElementById('token').value
       this.setStatus("Initiating transaction... (please wait)")
+      await createEscrowContract(buyerElement, loggedInWithAccount, tokenAddress).send({from: this.account}) 
+      await this.getEscrowId()
+      this.setStatus(`Escrow created! Escrow Id: ${this.escrowId}`);
 
-      this.escrowId = await createEscrowContract(buyerElement, loggedInWithAccount, tokenAddress).send({from: this.account})
-      this.escrowId =  await this.getEscrowId()
       await this.displayAccount() 
       await this.getBuyerAccount()
       await this.getSellerAccount()
+      await this.getEscrowState()
+      await this.getEtherBalance()
+      await this.getTokenSellerBalance()
 
-      this.setStatus("Escrow created! See Id number below");
   } catch (error) {
       this.setStatus("Error creating escrow! Open console in your browser for more details")
       console.log(error)
-  }
+    }
 
   },
 
@@ -114,36 +112,23 @@ const App = {
     await this.displayAccount() 
     await this.getBuyerAccount()
     await this.getSellerAccount()
-    //console.log(escrow256Artifact.address)
   },
+
 
   //This function returns the  the buyer's account
   getBuyerAccount: async function () {
-    let { getBuyerAccountAddress } = this.escrow.methods
-    let buyerAccountAddress = await getBuyerAccountAddress(this.escrowId).call()
-    let buyerAddressElement = document.getElementById("buyerAddress")
-    buyerAddressElement.innerHTML = buyerAccountAddress;
+      let { getBuyerAccountAddress } = this.escrow.methods
+      let buyerAccountAddress = await getBuyerAccountAddress(this.escrowId).call()
+      let buyerAddressElement = document.getElementById("buyerAddress")
+      buyerAddressElement.innerHTML = buyerAccountAddress;
   },
 
   //This function returns the seller's account
   getSellerAccount: async function () {
-    let ens = new ENS(ethereum);
-
     let { getSellerAccountAddress } = this.escrow.methods
     let sellerAccountAddress = await getSellerAccountAddress(this.escrowId).call()
-    
     let sellerAddressElement = document.getElementById("sellerAddress")
     sellerAddressElement.innerHTML = sellerAccountAddress
-
-    let sellerENSAccountAddress = await ens.reverse(sellerAccountAddress).name()
-    
-    // Check to be sure the reverse record is correct.
-    if(sellerAccountAddress != await ens.resolver(sellerENSAccountAddress).addr()) {
-      sellerENSAccountAddress = null;
-    }
-
-    let sellerENSAddressElement = document.getElementById("sellerENSAddress")
-    sellerENSAddressElement.innerHTML = sellerENSAccountAddress
   },
 
   //This function returns the escrow Id
@@ -162,7 +147,6 @@ const App = {
       this.setStatus('There was an error fetching your accounts.')
       return
     }
-
     if (accounts.length === 0) {
       this.setStatus("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.")
       return
@@ -172,7 +156,6 @@ const App = {
     account = accounts[0]
     let loggedInWithAccount = document.getElementById('account') 
     loggedInWithAccount.innerHTML = account
-    console.log(account)
     })
   },
 
@@ -187,6 +170,12 @@ const App = {
     let { buyerDeposit } = this.escrow.methods;
     await buyerDeposit(escrowId).send({ from: this.account, value: amount}) 
     this.setStatus("Transaction complete!")
+    await this.displayAccount() 
+    await this.getBuyerAccount()
+    await this.getSellerAccount()
+    await this.getEscrowState()
+    await this.getEtherBalance()
+    await this.getTokenSellerBalance()
   },  
   
   //This function sends the amount of tokens entered by the user to the buyer address entered by the user
@@ -194,9 +183,7 @@ const App = {
     let decimals = 18
     let decimalsBN = new BN(decimals)
     let multiplier = new BN(10).pow(decimalsBN)
-    //let escrowContractAddress = escrow256Artifact.address
-    let escrowContractAddress = '0x880D7BB56d7433344A2a4A86e92c56d2f0cAB89e'
-
+    let escrowContractAddress = '0x36e6cb7064232Bce10F22bb8AB9E3c2ac8F63d87'
     let tokenAmount = parseInt(document.getElementById("tokenAmount").value) 
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
     let tokenContract = document.getElementById("tokenContract").value
@@ -206,11 +193,8 @@ const App = {
       let { validateTokenSellerBalance } = this.escrow.methods
       this.setStatus("Initiating transaction... (please wait)")
       let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
-      // tokenInstance.balanceOf.call("0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41", {from: "0xb1Cf866ced575FD1A1997Daa5d6F099efb282E41"});
-      // let tokenContractBalanceOfSeller = await tokenContractInstance.balanceOf(this.account)
       let totalTokenBalance = await validateTokenSellerBalance(escrowId, tokenContract).call()
       this.setStatus("checking Token Balance!")
-
       if ((totalTokenBalance/multiplier) < tokenAmount) {
         this.setStatus("insufficient Token Balance!")
       }
@@ -224,8 +208,12 @@ const App = {
       let { TokenSellerDeposit } = this.escrow.methods
       await TokenSellerDeposit((tokenAmount), escrowId).send({ from: this.account})
       this.setStatus("Transaction complete!")
-      
-      
+      await this.displayAccount() 
+      await this.getBuyerAccount()
+      await this.getSellerAccount()
+      await this.getEscrowState()
+      await this.getEtherBalance()
+      await this.getTokenSellerBalance()
     }
   },
 
@@ -235,7 +223,6 @@ const App = {
     try{
     this.escrowId = document.getElementById("inlineFormInput").value 
     let { confirmTransaction } = this.escrow.methods
-    //let confirmation = await confirmTransaction(this.escrowId).send({ from: this.account})
     this.setStatus("Initiating confirmation... (please wait)")
     let escrowState = await confirmTransaction(this.escrowId).send({ from: this.account}) 
     this.setStatus("Confirmed!")
@@ -249,7 +236,7 @@ const App = {
   }
   },
 
-  //This function sets "canceled" variable to true in the contract and updates the state of the escrow
+  //This function sets "canceled" variable to true in the contract and updates the state of the respective escrow
   cancelTransaction: async function() {
     try{
 
@@ -267,7 +254,7 @@ const App = {
 }
   },
 
-  //This function sets "completed" variable to true in the contract and also updates the state of the escrow
+  //This function sets "completed" variable to true in the contract and also updates the state of the respective escrow
   completeTransaction: async function() {
     try{
 
@@ -284,15 +271,44 @@ const App = {
     catch (error) {
       this.setStatus("Error! Open browser console for more details")
       console.log(error)
-  }
+    }
   },
-
 
 //This function sets "canceled" variable to true in the contract and updates the state of the escrow
   setStatus: function(message) {
     let status = document.getElementById("status");
     status.innerHTML = message;
   },
+
+  //TODO:
+
+  //addressLookupENS: async function() {
+    // let contract
+    // let ENSElement = document.getElementById('ENS').value
+    // let addressFromENS = web3.eth.ens.getAddress(ENSElement);
+    //let address = await ens.resolver('alice.eth').addr();
+    // let ENSAddressElement = document.getElementById("addressLookupENS")
+    // ENSAddressElement.innerHTML = addressFromENS    
+  //},
+
+  //ensReverseLookup: async function () {
+    //let {ens} = new ENS(ethereum)
+    //let { ens } = this.ens;
+    // const { ens } = this;
+    // let sellerENSAccountAddress 
+    // await ens.reverse("0x0").name()
+    // let sellerENSAddressElement = document.getElementById("sellerENSAddress")
+    // sellerENSAddressElement.innerHTML = sellerENSAccountAddress
+
+    // let sellerENSAccountAddress = await this.ens.reverse("0xab3d7b0d369154e1449333d98dc9ae11a778e8f5").name()
+    // console.log(sellerENSAccountAddress)
+    // Check to be sure the reverse record is correct.
+    // if(sellerAccountAddress != await ens.resolver(sellerENSAccountAddress).addr()) {
+    //   sellerENSAccountAddress = null;
+    // }
+    // let sellerENSAddressElement = document.getElementById("sellerENSAddress")
+    // sellerENSAddressElement.innerHTML = sellerENSAccountAddress
+    //},
 };
 
 window.App = App;

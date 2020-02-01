@@ -195,13 +195,20 @@ function validateTokenSellerBalance(uint _escrowId, ERC20 _TokenContractAddress)
         address seller = Escrows[_escrowId].tokenSeller;
         ERC20 TokenContractAddress = _TokenContractAddress;
         uint tokenBalance = TokenContractAddress.balanceOf(seller);
-        //bool validateSufficiency = tokenBalance > tokenAmount;
         return tokenBalance;
 }
 
 /// @notice This function calls the "getEscrowStateString" function to return the State of the escrow in question 
 function getEscrowState(uint _escrowId) public view returns (string memory) {
         return getEscrowStateString(_escrowId);
+}
+/// @notice This function calls the canceled bool of the escrow in question 
+function getEscrowCancelBool(uint _escrowId) public view returns (bool) {
+        return Escrows[_escrowId].canceled;
+}
+/// @notice This function calls the created bool of the escrow in question 
+function getEscrowCreatedBool(uint _escrowId) public view returns (bool) {
+        return Escrows[_escrowId].created;
 }
 
 /// @notice This function is called by the "getEscrowState" function and returns the State of the escrow queried
@@ -238,6 +245,11 @@ function stopContract() public onlyOwner {
 function resumeContract() public onlyOwner {
         stopped = false;
 }
+
+/// @notice returns the bool stopped
+function getStopContractBool() public view returns (bool) {
+        return stopped;
+    }
 
 /// @notice This function destroys this smart contract can only be called by the owner, i.e. the address from which this contract has initially been deployed. This function allows the owner to kill the contract if there are serious issues with it and redeploy it after fixing the issue. The function will only be there during the beta phase and will be removed eventually in the final version.
 function destroyContract() public onlyOwner{

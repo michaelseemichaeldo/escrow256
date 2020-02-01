@@ -10,6 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- <link rel="icon" href="../../favicon.ico">
+      
     <link href="sticky-footer.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/js/all.min.js"></script>
@@ -21,7 +22,7 @@
   </head>
 
   <body  id="home" background= "iStock963459054.jpg"></body>
-      <nav class="navbar navbar-fixed-top navbar-expand-lg navbar-inverse bg-dark">
+      <nav class="navbar navbar-expand-lg navbar-inverse bg-dark">
         <a class="navbar-brand" href="index.html">Escrow256 </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -64,6 +65,7 @@
               </div>
               Please reload page when switching between accounts on Metamask
 
+               <!--Button for CreateEscrow Modal -->
             <br><br>
               <button type="button"  class="btn btn-success" data-toggle="modal" data-target="#createEscrowModal">
                 Create Escrow  
@@ -112,14 +114,6 @@
                 </div>        
                 <!-- End Send Modal -->
 
-                <!--Buttons for testing purposes:-->
-                    <!-- <button type="button" onclick="App.getEscrowId()" data-dismiss="modal" class="btn btn-primary">EscrowId</button>
-                    <button type="button" onclick="App.getEtherBalance()" data-dismiss="modal" class="btn btn-primary">EtherBalance</button>
-                    <button type="button" onclick="App.getTokenSellerBalance()" data-dismiss="modal" class="btn btn-primary">TokenSellerBalance</button>
-                    <button type="button" onclick="App.getEscrowState()" data-dismiss="modal" class="btn btn-primary">EscrowEstate</button>
-                    <button type="button" onclick="App.increaseEscrowId()" data-dismiss="modal" class="btn btn-primary">Increase EscrowId</button>
-                    <button type="button" onclick="App.cancelTransaction()" data-dismiss="modal" class="btn btn-primary">Cancel Transaction</button>
-                    <button type="button" onclick="App.completeTransaction()" data-dismiss="modal" class="btn btn-primary">Complete Transaction</button>  -->
                 <!--start EtherSend Modal -->
                 
                 <div class="modal fade" id="sendModal" tabindex="-1" role="dialog" aria-labelledby="sendModalLabel" aria-hidden="true">
@@ -190,42 +184,6 @@
               </div>         
               <!--end sendToken Modal--> 
 
-                       <!-- Start approveToken  Modal -->
-               <div class="modal fade" id="approveTokenModal" tabindex="-1" role="dialog" aria-labelledby="approveTokenModalLabel" aria-hidden="true">
-               <div class="modal-dialog" role="document">
-                     <div class="modal-content">
-                     <div class="modal-header">                          
-                        <h5 class="modal-title" id="approveTokenModalLabel">Approve your digital asset for lockup in the Escrow256 Contract</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                           <span aria-hidden="true">&times;</span>
-                        </button>
-                     </div>
-                     <div class="modal-body">
-                     <br>
-                        <form>
-                        <div class="form-group" > 
-                           <label for="approveTokenAmount">Amount of Tokens to be approved:   </label>
-                           <input type="text" class="form-control" id="approveTokenAmount" placeholder="Amount of Tokens to be sold">
-                        </div>
-                        <div class="form-group" > 
-                           <label for="escrowIdTokenApproval">Escrow Id</label>
-                           <input type="text" class="form-control" id="escrowIdTokenApproval" placeholder="Escrow Id">
-                        </div>
-                        <div class="form-group" > 
-                           <label for="tokenAddressTokenApproval">Token Contract Address</label>
-                           <input type="text" class="form-control" id="tokenAddressTokenApproval" placeholder="Token Contract Address">
-                        </div>
-                        </form>
-                     </div>
-                     <div class="modal-footer">
-                        <button type="button" onclick="App.approveTokenDeposit()" data-dismiss="modal" class="btn btn-primary">Send</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                     </div>
-                     </div>
-               </div>
-               </div>    
-
-                <!--end tokenTransfer Modal--> 
                 <br><br>
 
                 <!--start Show Escrow Details--> 
@@ -249,16 +207,17 @@
                   <br> Ether balance:  <span id="displayEtherAmount"></span> <span class="black"> Ether</span> 
                   <br> Token balance:  <span id="displayTokenAmount"></span> <span class="black"> Token</span>  
                   <br> Escrow state:   <span id="escrowState"></span> <span class="black"> </span> 
-                  <br> Seller address:  <span id="sellerAddress"></span> <span class="black"> </span>  
-                  <br> Seller ENS address:  <span id="sellerENSAddress"></span> <span class="black"> </span>  
+                  <br> Seller address:  <span id="sellerAddress"></span> <span class="black"> </span>
                   <br> Buyer address:   <span id="buyerAddress"></span> <span class="black"> </span> 
+  
+                  <!-- <br> Seller ENS address:  <span id="sellerENSAddress"></span> <span class="black"> </span>   -->
                   <br>
                   <br> You can also check the transactions on: <a href="https://ropsten.etherscan.io/">Etherscan</a>
                   <!-- <br> TokenContract balance: <span id="tokenContractBalance"></span> <span class="black"> </span>  -->
 
                   <br><br>
                       <div >      
-                            <!--Button for Send Modal -->                            
+                            <!--Button for Ether Send Modal -->                            
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#sendModal">
                               Send Ether  
                             </button>
@@ -281,7 +240,7 @@
                       </div>    
                 </div>
                 <!--end Show Escrow Balance-->
-
+     
                 </div>> 
                 <br><br>
           </div>

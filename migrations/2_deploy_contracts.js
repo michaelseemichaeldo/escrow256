@@ -6,6 +6,9 @@ const IERC20 = artifacts.require("IERC20");
 const Ownable = artifacts.require("Ownable");
 const SafeMath = artifacts.require("SafeMath");
 const SimpleToken = artifacts.require("SimpleToken");
+// const ENS = artifacts.require("@ensdomains/ens/ENSRegistry.sol");
+// const namehash = require('eth-ens-namehash');
+// const PublicResolver = artifacts.require('@ensdomains/ens/ReverseRegistrar.sol');
 
 module.exports = function(deployer) {
   deployer.deploy(ConvertLib);
