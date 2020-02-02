@@ -2,7 +2,7 @@ import Web3 from "web3";
 import ERC20json from "../../build/contracts/ERC20.json";
 import escrow256Artifact from "../../build/contracts/Escrow256.json";
 import BN from "bn.js";
-import ENS from "ethereum-ens"; 
+import ENS from "ethereum-ens";  //TODO: Include ENS for next update
 
 const App = {
   web3: null,
@@ -52,6 +52,7 @@ const App = {
       await this.getEscrowState()
       await this.getEtherBalance()
       await this.getTokenSellerBalance()
+      await this.validateTokenBalance()
 
   } catch (error) {
       this.setStatus("Error creating escrow! Open console in your browser for more details")
@@ -83,9 +84,6 @@ const App = {
 
   //This function returns the token balance of the escrow with the provided escrow id 
   getTokenSellerBalance: async function() {
-    const decimals = 18
-    const decimalsBN = new BN(decimals)
-    const divisor = new BN(10).pow(decimalsBN)
     let { getTokenSellerBalance } = this.escrow.methods
     let tokenBalance = await getTokenSellerBalance(this.escrowId).call()
     let tokenBalanceElement = document.getElementById("displayTokenAmount")
@@ -114,7 +112,6 @@ const App = {
     await this.getSellerAccount()
   },
 
-
   //This function returns the  the buyer's account
   getBuyerAccount: async function () {
       let { getBuyerAccountAddress } = this.escrow.methods
@@ -131,13 +128,11 @@ const App = {
     sellerAddressElement.innerHTML = sellerAccountAddress
   },
 
-  //This function returns the escrow Id
-  increaseEscrowId: async function() {
-    let { increaseEscrowId } = this.escrow.methods
-    let escrowId = await increaseEscrowId().send({ from: this.account})
-    console.log(escrowId)
-    let escrowIdElement = document.getElementById("escrowId")
-    escrowIdElement.innerHTML = escrowId;
+  //This function validates that contract has enough tokens
+  validateTokenBalance: async function() {
+    let { validateTokenBalance } = this.escrow.methods
+    let validation = await validateTokenBalance().call()
+    console.log(validation)
   },
 
   //This function displays the account with which the user is logged in in Metamask
@@ -164,8 +159,9 @@ const App = {
     let decimals = 18
     let decimalsBN = new BN(decimals)
     let multiplicator = new BN(10).pow(decimalsBN)
-    let amount = parseFloat(document.getElementById("etherAmount").value) * multiplicator
+    let amount = parseInt(document.getElementById("etherAmount").value) * multiplicator
     let escrowId = parseInt(document.getElementById("escrowIdEther").value)
+    this.escrowId = escrowId
     this.setStatus("Initiating transaction... (please wait)")
     let { buyerDeposit } = this.escrow.methods;
     await buyerDeposit(escrowId).send({ from: this.account, value: amount}) 
@@ -183,7 +179,7 @@ const App = {
     let decimals = 18
     let decimalsBN = new BN(decimals)
     let multiplier = new BN(10).pow(decimalsBN)
-    let escrowContractAddress = '0x36e6cb7064232Bce10F22bb8AB9E3c2ac8F63d87'
+    let escrowContractAddress = '0xfd2cf876801400734fdccc9357a36C235499CEd3'
     let tokenAmount = parseInt(document.getElementById("tokenAmount").value) 
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
     let tokenContract = document.getElementById("tokenContract").value
@@ -206,7 +202,7 @@ const App = {
     catch{
       this.setStatus("Confirm transaction on Metamask... Open browser console if there is no Metamask notification for more info.")
       let { TokenSellerDeposit } = this.escrow.methods
-      await TokenSellerDeposit((tokenAmount), escrowId).send({ from: this.account})
+      await TokenSellerDeposit(tokenContract, tokenAmount, escrowId).send({ from: this.account})
       this.setStatus("Transaction complete!")
       await this.displayAccount() 
       await this.getBuyerAccount()
@@ -218,17 +214,17 @@ const App = {
   },
 
 
-  //This function sets the confirmation variable to true in the contract and updates the state of the escrow
+  //This function sets the "confirmation" variable to true in the contract and updates the state of the escrow
   confirmation: async function() {
     try{
-    this.escrowId = document.getElementById("inlineFormInput").value 
-    let { confirmTransaction } = this.escrow.methods
-    this.setStatus("Initiating confirmation... (please wait)")
-    let escrowState = await confirmTransaction(this.escrowId).send({ from: this.account}) 
-    this.setStatus("Confirmed!")
-    let escrowStateElement = document.getElementById("escrowState")
-    escrowStateElement.innerHTML = escrowState;
-    console.log(escrowState)
+      this.escrowId = document.getElementById("inlineFormInput").value 
+      let { confirmTransaction } = this.escrow.methods
+      this.setStatus("Initiating confirmation... (please wait)")
+      let escrowState = await confirmTransaction(this.escrowId).send({ from: this.account}) 
+      this.setStatus("Confirmed!")
+      let escrowStateElement = document.getElementById("escrowState")
+      escrowStateElement.innerHTML = escrowState;
+      console.log(escrowState)
   }
     catch (error) {
       this.setStatus("Error! Open browser console for more details")
@@ -239,14 +235,13 @@ const App = {
   //This function sets "canceled" variable to true in the contract and updates the state of the respective escrow
   cancelTransaction: async function() {
     try{
-
-    this.escrowId = document.getElementById("inlineFormInput").value 
-    let { cancelTransaction } = this.escrow.methods
-    this.setStatus("Initiating cancellation... (please wait)")
-    let escrowState = await cancelTransaction(this.escrowId).send({ from: this.account}) 
-    this.setStatus("Transaction canceled!")    
-    let escrowStateElement = document.getElementById("escrowState")
-    escrowStateElement.innerHTML = escrowState;
+      this.escrowId = document.getElementById("inlineFormInput").value 
+      let { cancelTransaction } = this.escrow.methods
+      this.setStatus("Initiating cancellation... (please wait)")
+      let escrowState = await cancelTransaction(this.escrowId).send({ from: this.account}) 
+      this.setStatus("Transaction canceled!")    
+      let escrowStateElement = document.getElementById("escrowState")
+      escrowStateElement.innerHTML = escrowState;
   }
   catch (error) {
     this.setStatus("Error! Open browser console for more details")
@@ -258,15 +253,15 @@ const App = {
   completeTransaction: async function() {
     try{
 
-    this.escrowId = document.getElementById("inlineFormInput").value 
-    let { completeTransaction } = this.escrow.methods
+      this.escrowId = document.getElementById("inlineFormInput").value 
+      let { completeTransaction } = this.escrow.methods
 
-    this.setStatus("Initiating transaction... (please wait)")
-    await completeTransaction(this.escrowId).send({ from: this.account}) 
-    
-    this.setStatus("Transaction complete!")
-    let escrowStateElement = document.getElementById("escrowState")
-    escrowStateElement.innerHTML = escrowState;
+      this.setStatus("Initiating transaction... (please wait)")
+      await completeTransaction(this.escrowId).send({ from: this.account}) 
+      
+      this.setStatus("Transaction complete!")
+      let escrowStateElement = document.getElementById("escrowState")
+      escrowStateElement.innerHTML = escrowState;
     }
     catch (error) {
       this.setStatus("Error! Open browser console for more details")
@@ -280,7 +275,7 @@ const App = {
     status.innerHTML = message;
   },
 
-  //TODO:
+  //TODO for next update:
 
   //addressLookupENS: async function() {
     // let contract
