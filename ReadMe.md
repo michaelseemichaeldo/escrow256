@@ -24,11 +24,13 @@ The Escrow256 dApp is a simple contract to escrow ERC20 tokens and ether.
 
 In order to build and run the frontend code LOCALLY:
 
-1. Run have npm (run npm install)
-2. Make sure you have ganache running
-3. "truffle compile" to create the json contract artifacts
-4. "truffle migrate --reset --network development" to deploy the contracts onto the network ("development" will deploy locally to ganache)
-5. write down the escrow contract's address and copy it into the front end to assign it to the escrowContractAddress variable.
+1. Clone this repository to your machine
+1. Run have nodejs and npm installed
+2. Co the app folder with the package.json file and run npm install to install the dependencies
+2. Make sure you have ganache installed and running
+3. Go up to the escrow256 containing the contracts folder and run "truffle compile" to create the json contract artifacts
+4. Then run "truffle migrate --reset --network development" to deploy the contracts onto the network ("development" will deploy locally to ganache)
+5. Write down the escrow contract's address and copy it into the front end to assign it to the "escrowContractAddress" variable in the "sendToken" function. That way the tokens get sent to the escrow contract's address when the function is called.
 6. "npm run build" to compile the javascript and html assets into the build folder
 7. "npm run dev" to serve the assets in the build folder
-8. go to the host and port that truffle is serving (default is localhost:8080) in order to see the served assets
+8. Go to the host and port that truffle is serving (default is localhost:8080) in order to see the served assets

@@ -21,7 +21,7 @@
   </head>
 
   <body  id="home" background= "iStock963459054.jpg"></body>
-      <nav class="navbar navbar-expand-lg navbar-inverse bg-dark">
+      <nav class="navbar navbar-expand navbar-inverse bg-dark fixed-top">
         <a class="navbar-brand" href="index.html">Escrow256 </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -42,6 +42,18 @@
         .navbar-inverse .nav-link{
         color: white;
         }
+        .navbar-toggler{
+        color: white;
+        }
+        .collapse navbar-collapse{
+          color: white;
+        }
+        footer {
+          position: fixed;
+          height: 100px;
+          bottom: 0;
+          width: 100%;
+          }        
       </style>
 
       <!--<div class="container"> -->
@@ -232,7 +244,7 @@
                             <p > When both parties have confirmed and the escrow state has changed to READY_TO_COMPLETE_TRANSFER, you can click on Complete Transaction to transfer the balances to the respective parties. If you would like to cancel and receive you tokens / ether back, please click cancel: </p>
                           
                             <button type="button" onclick="App.completeTransaction()" data-dismiss="modal" class="btn btn-dark">Complete Transaction</button>
-
+<br><br>
                             <button type="button" onclick="App.cancelTransaction()" data-dismiss="modal" class="btn btn-secondary">Cancel Transaction</button>
             
                           <!-- <button type="button" onclick="App.getTokenContractBalance()" data-dismiss="modal" class="btn btn-secondary">get Token Balance</button> -->
@@ -258,7 +270,7 @@
             </div>
 
             <div class="col-sm-12">
-                <h3 style="color:white;"> Follow Us</h3style="color:white;">
+                <h3 style="color:white;"> Follow Us</h3 style="color:white;">
                 <a href="https://web.facebook.com/"><i class="fab fa-facebook-f"></i></a>
                 <a href="https://twitter.com/"><i class="fab fa-twitter"></i></a>
             </div>
@@ -273,10 +285,10 @@
               clear: both;
               position: relative;
               width: 100%;
-              /* Set the fixed height of the footer here */
-              height: 390px;
+              height: 530px;
               background-color: rgb(43, 41, 41);
               margin-top: -390;
+              bottom: 0;
             }
           </style>
         </footer>

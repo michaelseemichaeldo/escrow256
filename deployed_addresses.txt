@@ -3,6 +3,7 @@ Project includes a file called deployed_addresses.txt that describes where the d
 Ropsten Testnet:
 
 Escrow256 contract (use last deployment): 
+fith deployment: 0x98a565b050091bd7663931e8eC1b467281460797
 fourth deployment: 0x880D7BB56d7433344A2a4A86e92c56d2f0cAB89e
 third deployment: 0xA57e0a18f91f626bd30A505d484f194e9bEd2987
 second deployment: 0x48442802cb1C9De3eeB7198B7108b57619abA590
@@ -14,6 +15,7 @@ Owner:
 
 
 ERC20 SimpleToken: 
+fith deployment: 0x3FE69b8d22a1364AE70340b27Ed22b0FBD6DAF67
 fourth deployement: 0x7783AcAc0fb1b0a31E796bC742F17645b4fa2b40
 third deployment: 0x24c94692987C500cb0070bC41A249590cCBBC8F2
 second deployment: 0x173F8f2EaaCf34020bb41cb308085250A021Fb52
