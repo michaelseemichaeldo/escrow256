@@ -76,7 +76,7 @@ describe("updateState at Cancellation", () => {
         let escrowId = 1
         let simpleTokenAddress = instanceSimpleToken.address
         await instance.createEscrowContract(seller, buyer, simpleTokenAddress, {from: seller})
-        await instance.cancelTransaction(escrowId, {from: seller})
+        await instance.cancelTransaction(escrowId, simpleTokenAddress,{from: seller})
         let escrowState = await instance.getEscrowState(escrowId, {from: seller})
         assert.equal(escrowState, expectedState, "EscrowState should be CANCELED")
     })
@@ -94,7 +94,7 @@ describe("updateState at buyerConfirmation", () => {
 
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
         await instance.buyerDeposit( escrowId, {from: buyer, value: etherAmount})
-        await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens, escrowId, {from: seller}) 
+        await instance.TokenSellerDeposit(simpleTokenAddress,simpleTokenAddress, numberOfTokens, escrowId, {from: seller}) 
         await instance.confirmTransaction(escrowId, {from: buyer})
         let escrowState = await instance.getEscrowState(escrowId, {from: buyer})
         assert.equal(escrowState, expectedState, "EscrowState should be TOKENSELLER_CONFIRMATION_OUTSTANDING")
@@ -117,32 +117,13 @@ describe("updateState at sellerConfirmation", () => {
 
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
         await instance.buyerDeposit( escrowId, {from: buyer, value: etherAmount})
-        await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens, escrowId, {from: seller}) 
+        await instance.TokenSellerDeposit(simpleTokenAddress, simpleTokenAddress, numberOfTokens, escrowId, {from: seller}) 
         await instance.confirmTransaction(escrowId, {from: seller})
         let escrowState = await instance.getEscrowState(escrowId, {from: seller})
         assert.equal(escrowState, expectedState, "EscrowState should be BUYER_CONFIRMATION_OUTSTANDING")
     })
 })
 
-//testing to check that validation fails if total token deposited does not equal total tokens owned by contract
-describe("validation of escrow Balance", () => {
-
-    it("escrow balance validation function should return false if deposited amount does not equal amount owned by contract", async() => {
-        let expectedBool = false
-        let numberOfTokens1 = 100
-        let numberOfTokens2 = 200
-        let escrowId = 1
-        let simpleTokenAddress = instanceSimpleToken.address
-        let validationBool = true
-
-        await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
-        await instanceSimpleToken.transfer(instance.address, numberOfTokens1, {from: seller})
-        await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens2, escrowId, {from: seller}) 
-        await instance.validateTokenBalance( {from: seller})
-        validationBool = await instance.getValidated( {from: seller})
-        assert.equal(validationBool, expectedBool, "Should return false")
-    })
-})
 
 //testing to check that validation fails if total token deposited does not equal total tokens owned by contract
 describe("validation of escrow Balance should cause token deposit to fail", () => {
@@ -159,7 +140,7 @@ describe("validation of escrow Balance should cause token deposit to fail", () =
 
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
         await instanceSimpleToken.transfer(instance.address, numberOfTokens1, {from: seller})
-        await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens2, escrowId, {from: seller}) 
+        await instance.TokenSellerDeposit(simpleTokenAddress, simpleTokenAddress, numberOfTokens2, escrowId, {from: seller}) 
          await instance.getValidated({from: seller})
         try{
             await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens2, escrowId, {from: seller}) 
@@ -182,7 +163,7 @@ describe("TokenSellerDeposit", () => {
         let simpleTokenAddress = instanceSimpleToken.address
 
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
-        await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
+        await instance.TokenSellerDeposit(simpleTokenAddress, simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
         await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
         let tokenBalanceEscrowMapping = await instance.getTokenSellerBalance(escrowId)
         assert.equal(tokenBalanceEscrowMapping, expected, "TokenBalance should be 100")
@@ -208,7 +189,7 @@ describe("Initial SimpleToken balance after transaction should be reduced by amo
         let numberOfTokens = 100
         let escrowId = 1
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
-        await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
+        await instance.TokenSellerDeposit(simpleTokenAddress,simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
         await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
         let sellersTokenBalance = await instanceSimpleToken.balanceOf(seller, {from: seller})
         assert.equal(sellersTokenBalance, expected, "TokenBalance should be 9999999999999999999900")
@@ -238,72 +219,78 @@ describe("update canceled bool upon cancelation", () => {
         let expectedStatusBool = true
         let simpleTokenAddress = instanceSimpleToken.address
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
-        let escrowStatusBool = await instance.cancelTransaction.call(escrowId, {from: seller})
+        let escrowStatusBool = await instance.cancelTransaction.call(escrowId, simpleTokenAddress, {from: seller})
         assert.equal(escrowStatusBool, expectedStatusBool, "canceled should be CANCELED")
     })
 })
 
-//testing to check that the escrow ether balance gets updated to "0" when the seller calls the completeTransaction function of that particular escrow
-describe("CompleteTransaction", () => {
+//testing to check that the escrow ether balance is correct before seller calls the completeTransaction function of that particular escrow
+describe("buyerConfirmation & sellerConfirmation", () => {
 
-    it("completeTransaction should result in ether balance 0", async() => {
+    it("buyerConfirmation & sellerConfirmation should result in ether balance 5", async() => {
         let etherAmount = 5
         let numberOfTokens = 100
-        let etherAmountExpected = 0
+        let etherAmountExpected = 5
         let escrowId = 1
         let simpleTokenAddress = instanceSimpleToken.address
-        await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
+        let instance = await Escrow256.new()
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
+        await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
         await instance.buyerDeposit( escrowId, {from: buyer, value: etherAmount})
-        await instance.TokenSellerDeposit( simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
+        await instance.TokenSellerDeposit( simpleTokenAddress,simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
         await instance.sellerConfirmTransaction(escrowId,  {from: seller})
         await instance.buyerConfirmTransaction(escrowId,  {from: buyer})
-        await instance.completeTransaction(escrowId, {from: seller})
-        let escrowEtherBalance = await instance.getEtherBalance(escrowId, {from: seller})
-        assert.equal(escrowEtherBalance, etherAmountExpected , "EtherBalance should be 0")
+        let escrowEtherBalance = new BN(await instance.getEtherBalance(escrowId, {from: seller})).toString()
+        assert.equal(escrowEtherBalance, etherAmountExpected , "EtherBalance should be 5")
     })
 
 })
 
-//testing to check that seller's escrow token balance gets updated to zero when the completeTransaction function of a particular escrow is called (by the seller in this test)
-describe("CompleteTransaction", () => {
+//testing to check that seller's escrow token balance is correct before the  completeTransaction function of a particular escrow is called (by the seller in this test)
+describe("buyerConfirmation & sellerConfirmation", () => {
 
-    it("completeTransaction should result in seller's token balance 0 at escrowContract", async() => {
+    it("At buyerConfirmation & sellerConfirmation the seller's token balance should equal 100 at escrowContract", async() => {
+        let decimals = 18
+        let decimalsBN = new BN(decimals)
+        let multiplier = new BN(10).pow(decimalsBN)
        let simpleTokenAddress = instanceSimpleToken.address
        let etherAmount = 5
        let numberOfTokens = 100
-       let tokenAmountExpected = 0
+       let tokenAmountExpected = 100
        let escrowId = 1
-       await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
+ 
+
        await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
+       await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
        await instance.buyerDeposit( escrowId, {from: buyer, value: etherAmount})
-       await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
+       await instance.TokenSellerDeposit(simpleTokenAddress, simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
        await instance.sellerConfirmTransaction(escrowId,  {from: seller})
        await instance.buyerConfirmTransaction(escrowId,  {from: buyer})
-       await instance.completeTransaction(escrowId, {from: seller})
-       let escrowTokenBalance = await instance.getTokenSellerBalance(escrowId, {from: seller})
+       let escrowTokenBalance = new BN(await instance.getTokenSellerBalance(escrowId, {from: seller})).toString()
        assert.equal(escrowTokenBalance, tokenAmountExpected , "TokenBalance should be 0")
     })
 
 })
 
-//testing to check that the ERC20 simpleToken balance of the seller gets updated correctly after the user calls the completeTransaction function
-describe("CompleteTransaction", () => {
+//testing to check that the ERC20 simpleToken balance of the seller is correct before the user calls the completeTransaction function
+describe("buyerConfirmation & sellerConfirmation", () => {
 
-    it("completeTransaction should result in buyer's token balance of 100 at SimpleToken Contract", async() => {
+    it("At buyerConfirmation & sellerConfirmation the buyer's token balance should be 0 at SimpleToken Contract", async() => {
+        let decimals = 18
+        let decimalsBN = new BN(decimals)
+        let multiplier = new BN(10).pow(decimalsBN)
         let etherAmount = 5
-        let numberOfTokens = 100
-        let tokenAmountExpected = 100
+        let numberOfTokens = new BN(100).toString() 
+        let tokenAmountExpected = 0
         let escrowId = 1
         let simpleTokenAddress = instanceSimpleToken.address
-        await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
         await instance.createEscrowContract(buyer, seller, simpleTokenAddress, {from: seller})
+        await instanceSimpleToken.transfer(instance.address, numberOfTokens, {from: seller})
         await instance.buyerDeposit( escrowId, {from: buyer, value: etherAmount})
-        await instance.TokenSellerDeposit(simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
+        await instance.TokenSellerDeposit(simpleTokenAddress, simpleTokenAddress, numberOfTokens, escrowId, {from: seller})
         await instance.sellerConfirmTransaction(escrowId,  {from: seller})
         await instance.buyerConfirmTransaction(escrowId,  {from: buyer})
-        await instance.completeTransaction(escrowId, {from: seller})
-        let buyersTokenBalance = new BN(await instanceSimpleToken.balanceOf(buyer, {from: buyer})).toString()
+        let buyersTokenBalance = new BN(await instanceSimpleToken.balanceOf(buyer, {from: buyer})).toString()/multiplier
         assert.equal(buyersTokenBalance, tokenAmountExpected , "TokenBalance should be 100")
     })
 

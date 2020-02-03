@@ -17,6 +17,7 @@ contract Escrow256 is ERC20 {
     uint public totalTokenBalanceSent=0;
     uint public totalTokensEscrowOwns=0;
     bool validated = false;
+    ERC20 Tokens;
 
     struct EscrowContract {
         address payable buyer;
@@ -34,6 +35,8 @@ contract Escrow256 is ERC20 {
     }
 
 mapping(uint => EscrowContract) Escrows;
+mapping (address  => uint) TotalForToken;
+
 
 event EscrowContractCreated(uint EscrowId, address buyer, address tokenSeller);
 event buyerDepositEvent(uint value);
@@ -132,23 +135,24 @@ function buyerDeposit(uint _escrowId) public stopInEmergency payable {
 }
 
 /// @notice This function can be called by the seller when sending the erc20 token. It updates the token balance of the escrow with the respective Id.  
-function TokenSellerDeposit(ERC20 _token, uint _numberOfTokens, uint _escrowId) public stopInEmergency returns (uint) {
+function TokenSellerDeposit(ERC20 _token, address _tokenAddress, uint _numberOfTokens, uint _escrowId) public stopInEmergency returns (uint) {
     require(msg.sender == Escrows[_escrowId].tokenSeller, "Sender does not match sellers address entered at creation of escrow");
     require(!Escrows[_escrowId].canceled, "The escrow has been canceled by one of the parties and cannot be used anymore");
     require(!Escrows[_escrowId].completed, "The escrow transaction with this ID has already completed and cannot be used anymore");
-    require (this.validateTokenBalance(), "Validation failed. Contract owns not the same amount of tokens as have been deposited!");
+    //require (this.validateTokenBalance(), "Validation failed. Contract owns not the same amount of tokens as have been deposited!");
     Escrows[_escrowId].TokenBalance = Escrows[_escrowId].TokenBalance.add(_numberOfTokens);
+    
     ERC20 Token = _token;
-    uint totalEscrowTokens = Token.balanceOf(address(this));
-    totalTokensEscrowOwns = totalTokensEscrowOwns.add(totalEscrowTokens);
-    totalTokenBalanceSent = totalTokenBalanceSent.add(_numberOfTokens);
+    //totalTokensEscrowOwns = Token.balanceOf(address(this));
+   //totalTokenBalanceSent = TotalForToken[_tokenAddress].add(_numberOfTokens);
+    //this.validateTokenBalance(_tokenAddress);
     emit sellerDepositEvent(Escrows[_escrowId].TokenBalance);
     uint TokenBalance = Escrows[_escrowId].TokenBalance;
     return TokenBalance;
 }
 
 /// @notice This function sets the state of the escrow to to "CANCELED", updates the canceled bool to true and transfers the respective balances to the buyer and seller. This function can be called by either party of the transaction.
-function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool) {
+function cancelTransaction(uint _escrowId, address _tokenAddress) public stopInEmergency returns (bool) {
     require((msg.sender == Escrows[_escrowId].buyer ) || (msg.sender == Escrows[_escrowId].tokenSeller), "Only buyer or seller account can cancel transaction");
     require (Escrows[_escrowId].created, "Escrow with provided id has not been created");
     require (!Escrows[_escrowId].canceled, "The contract is already canceled");
@@ -161,6 +165,7 @@ function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool)
     Escrows[_escrowId].EtherBalance = 0; 
     Escrows[_escrowId].TokenBalance = 0;
     Escrows[_escrowId].canceled = true;
+    //totalTokenBalanceSent = TotalForToken[_tokenAddress].sub(TokenBalance); // subtraction overflow
     buyer.transfer(EtherBalance); 
     Token.transfer(tokenSeller, TokenBalance); 
     Escrows[_escrowId].currentState = State.CANCELED;
@@ -169,11 +174,11 @@ function cancelTransaction(uint _escrowId) public stopInEmergency returns (bool)
 }
 
 /// @notice This function completes the exchange, sets the state of the escrow to to "COMPLETED" and the bool completed to true, and subsequently transfers the respective balances to the buyer and seller. This function can be called by either party of the transaction.
-function completeTransaction(uint _escrowId) public stopInEmergency {
+function completeTransaction(uint _escrowId, address _tokenAddress) public stopInEmergency {
     require(!Escrows[_escrowId].canceled, "Escrow is canceled.");
     require(Escrows[_escrowId].buyerConfirmation, "Both buyer and seller need to confirm to complete transaction");
     require(Escrows[_escrowId].tokenSellerConfirmation, "Both buyer and seller need to confirm to complete transaction");
-    require (validated, "Validation failed. Contract owns not the same amount of tokens as have been deposited!");
+    //require (validated, "Validation failed");
     address payable tokenSeller = Escrows[_escrowId].tokenSeller;
     uint EtherBalance = Escrows[_escrowId].EtherBalance;
     address payable buyer = Escrows[_escrowId].buyer;
@@ -181,9 +186,10 @@ function completeTransaction(uint _escrowId) public stopInEmergency {
     Escrows[_escrowId].EtherBalance = 0; 
     Escrows[_escrowId].TokenBalance = 0;
     Escrows[_escrowId].completed = true;
+    //totalTokenBalanceSent = TotalForToken[_tokenAddress].sub(TokenBalance);  // subtraction overflow
     ERC20 Token = Escrows[_escrowId].Token;
     tokenSeller.transfer(EtherBalance);
-    Token.transfer(buyer, TokenBalance); 
+    Token.transfer(buyer, (TokenBalance).mul(1000000000000000000)); 
     this.updateStatus(_escrowId);
     emit completeTransactionEvent(Escrows[_escrowId].EtherBalance, Escrows[_escrowId].currentState);
 }
@@ -192,6 +198,12 @@ function completeTransaction(uint _escrowId) public stopInEmergency {
 function getEtherBalance(uint _escrowId) public view returns (uint) {
     uint etherBalance = Escrows[_escrowId].EtherBalance;
     return etherBalance;
+}
+
+/// @notice To return the ERC20 Token
+function getToken(uint _escrowId) public view returns (ERC20) {
+    ERC20 token = Escrows[_escrowId].Token;
+    return token;
 }
 
 /// @notice This function returns the token balance of the escrow with the provided Id 
@@ -251,9 +263,14 @@ function getContractTokenBalance() public view returns (uint) {
         return totalTokensEscrowOwns;
 }
 
-/// @notice validates that the escrow owns an equal amount of tokens that have been sent to it
-function validateTokenBalance() public returns (bool) {
-        if (totalTokenBalanceSent == totalTokensEscrowOwns) {
+function getTotalForToken(address _tokenAddress) public view returns (uint) {
+        return TotalForToken[_tokenAddress];
+}
+
+/// @notice validates that the escrow owns an equal amount of tokens that have been sent to it.
+function validateTokenBalance(address _tokenAddress) public returns (bool) {
+        uint TotalForToken = TotalForToken[_tokenAddress];
+        if ((totalTokensEscrowOwns) == TotalForToken) {
             validated = true;
             return validated;
         }
@@ -262,7 +279,6 @@ function validateTokenBalance() public returns (bool) {
             return validated;
         }
 }
-
 
 /// @notice returns the validate bool, which is true if the escrow owns an equal amount of tokens that have been sent to it
 function getValidated() public view returns (bool) {

@@ -52,6 +52,7 @@ const App = {
       await this.getEscrowState()
       await this.getEtherBalance()
       await this.getTokenSellerBalance()
+      await this.getToken()
       await this.validateTokenBalance()
 
   } catch (error) {
@@ -110,6 +111,7 @@ const App = {
     await this.displayAccount() 
     await this.getBuyerAccount()
     await this.getSellerAccount()
+    await this.getToken()
   },
 
   //This function returns the  the buyer's account
@@ -128,10 +130,18 @@ const App = {
     sellerAddressElement.innerHTML = sellerAccountAddress
   },
 
+  getToken: async function () {
+    let { getToken } = this.escrow.methods
+    let tokenAddress = await getToken(this.escrowId).call()
+    let tokenAddressElement = document.getElementById("tokenAddress")
+    tokenAddressElement.innerHTML = tokenAddress
+  },
+
   //This function validates that contract has enough tokens
   validateTokenBalance: async function() {
     let { validateTokenBalance } = this.escrow.methods
-    let validation = await validateTokenBalance().call()
+    let tokenAddress = document.getElementById('token').value
+    let validation = await validateTokenBalance(tokenAddress).call()
     console.log(validation)
   },
 
@@ -158,8 +168,8 @@ const App = {
   sendEther: async function() {
     let decimals = 18
     let decimalsBN = new BN(decimals)
-    let multiplicator = new BN(10).pow(decimalsBN)
-    let amount = parseInt(document.getElementById("etherAmount").value) * multiplicator
+    let multiplier = new BN(10).pow(decimalsBN)
+    let amount = parseInt(document.getElementById("etherAmount").value) * multiplier
     let escrowId = parseInt(document.getElementById("escrowIdEther").value)
     this.escrowId = escrowId
     this.setStatus("Initiating transaction... (please wait)")
@@ -172,6 +182,8 @@ const App = {
     await this.getEscrowState()
     await this.getEtherBalance()
     await this.getTokenSellerBalance()
+    await this.getToken()
+
   },  
   
   //This function sends the amount of tokens entered by the user to the buyer address entered by the user
@@ -179,7 +191,7 @@ const App = {
     let decimals = 18
     let decimalsBN = new BN(decimals)
     let multiplier = new BN(10).pow(decimalsBN)
-    let escrowContractAddress = '0x98a565b050091bd7663931e8eC1b467281460797'
+    let escrowContractAddress = '0x1da9e8685e9155AD46A48a538BA1aCB3b3b942BC'
     let tokenAmount = parseInt(document.getElementById("tokenAmount").value) 
     let escrowId = parseInt(document.getElementById("escrowIdToken").value)
     let tokenContract = document.getElementById("tokenContract").value
@@ -191,18 +203,18 @@ const App = {
       let tokenContractInstance = web3.eth.contract(ERC20json.abi).at(tokenContract)
       let totalTokenBalance = await validateTokenSellerBalance(escrowId, tokenContract).call()
       this.setStatus("checking Token Balance!")
-      if ((totalTokenBalance/multiplier) < tokenAmount) {
+      if ((totalTokenBalance) < tokenAmount) {
         this.setStatus("insufficient Token Balance!")
       }
       else{
-      await tokenContractInstance.transfer(escrowContractAddress, tokenAmount * multiplier).send({from: this.account})
+      await tokenContractInstance.transfer(escrowContractAddress, tokenAmount * multiplier ).send({from: this.account})
       }
     }
 
     catch{
       this.setStatus("Confirm transaction on Metamask... Open browser console if there is no Metamask notification for more info.")
       let { TokenSellerDeposit } = this.escrow.methods
-      await TokenSellerDeposit(tokenContract, tokenAmount, escrowId).send({ from: this.account})
+      await TokenSellerDeposit(tokenContract, tokenContract, tokenAmount, escrowId).send({ from: this.account})
       this.setStatus("Transaction complete!")
       await this.displayAccount() 
       await this.getBuyerAccount()
@@ -210,6 +222,8 @@ const App = {
       await this.getEscrowState()
       await this.getEtherBalance()
       await this.getTokenSellerBalance()
+      await this.getToken()
+
     }
   },
 
@@ -219,7 +233,10 @@ const App = {
     try{
       this.escrowId = document.getElementById("inlineFormInput").value 
       let { confirmTransaction } = this.escrow.methods
+
       this.setStatus("Initiating confirmation... (please wait)")
+      let tokenAddress = await this.getToken()
+
       let escrowState = await confirmTransaction(this.escrowId).send({ from: this.account}) 
       this.setStatus("Confirmed!")
       let escrowStateElement = document.getElementById("escrowState")
@@ -237,8 +254,10 @@ const App = {
     try{
       this.escrowId = document.getElementById("inlineFormInput").value 
       let { cancelTransaction } = this.escrow.methods
+      let { getToken } = this.escrow.methods
+      let tokenAddress = await getToken(this.escrowId).call()
       this.setStatus("Initiating cancellation... (please wait)")
-      let escrowState = await cancelTransaction(this.escrowId).send({ from: this.account}) 
+      let escrowState = await cancelTransaction(this.escrowId, tokenAddress).send({ from: this.account}) 
       this.setStatus("Transaction canceled!")    
       let escrowStateElement = document.getElementById("escrowState")
       escrowStateElement.innerHTML = escrowState;
@@ -252,13 +271,12 @@ const App = {
   //This function sets "completed" variable to true in the contract and also updates the state of the respective escrow
   completeTransaction: async function() {
     try{
-
       this.escrowId = document.getElementById("inlineFormInput").value 
       let { completeTransaction } = this.escrow.methods
-
+       let { getToken } = this.escrow.methods
+       let tokenAddress = await getToken(this.escrowId).call()
       this.setStatus("Initiating transaction... (please wait)")
-      await completeTransaction(this.escrowId).send({ from: this.account}) 
-      
+      await completeTransaction(this.escrowId, tokenAddress ).send({ from: this.account})   
       this.setStatus("Transaction complete!")
       let escrowStateElement = document.getElementById("escrowState")
       escrowStateElement.innerHTML = escrowState;

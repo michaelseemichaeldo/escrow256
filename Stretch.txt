@@ -1,4 +1,0 @@
-The project uses an upgradable design pattern for the smart contracts
-At least one contract is written in Vyper or LLL
-Ethereum Name Service
-The project uses an Oracle service such as Oraclize
