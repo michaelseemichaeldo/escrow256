@@ -169,7 +169,7 @@ const App = {
     let decimals = 18
     let decimalsBN = new BN(decimals)
     let multiplier = new BN(10).pow(decimalsBN)
-    let amount = parseInt(document.getElementById("etherAmount").value) * multiplier
+    let amount = document.getElementById("etherAmount").value * multiplier
     let escrowId = parseInt(document.getElementById("escrowIdEther").value)
     this.escrowId = escrowId
     this.setStatus("Initiating transaction... (please wait)")
