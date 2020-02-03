@@ -37,3 +37,4 @@ In order to build and run the frontend code LOCALLY:
 7. "npm run dev" to serve the assets in the build folder
 8. Go to the host and port that truffle is serving (default is localhost:8080) in order to see the served assets
 
+If you don't want to run it locally you can also access the dApp via http://escrow256.com
