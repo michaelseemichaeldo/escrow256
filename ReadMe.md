@@ -1,8 +1,3 @@
-<!-- README.md that explains your project
-○  	What does your project do?
-○  	How to set it up
-■  	Run a local development server -->
-
 # Escrow256
 
 The Escrow256 dApp is a simple contract to escrow ERC20 tokens and ether. It allows a token owner to sell their token for ether trustlessly. In the upcoming tokenization of assets this will be something useful to transact between two parties by minimising credit risk, i.e. the parties don't have to trust each other or a third party (escrow agent) they can instead rely the transparent escrow256 smart contract to hold the assets until both parties have delivered the digital assets.
