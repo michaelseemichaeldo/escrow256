@@ -27,15 +27,15 @@ In order to build and run the project including the frontend code LOCALLY:
 
 1. Clone this repository to your machine to run the project on your system.
 2. Make sure you have nodejs and npm installed
-3. Go to the app folder with the package.json file and run npm install to install the dependencies
+3. Go to the app folder with the package.json file and run `$npm install` to install the dependencies
 4. Make sure you have ganache installed and running. 
 5. Go up to the escrow256 folder containing the contracts folder
 6. Start your development blockchain by running `$ truffle develop` from the terminal in the escrow256 project directory.
-7. Run " compile" to create the json contract artifacts (you might have to run npm install again in that folder)
-8. Then run "truffle migrate --reset --network development" to deploy the contracts onto the network ("development" will deploy locally to ganache)
-9. Write down the escrow contract's address and copy it into the front end to assign it to the "escrowContractAddress" variable in the "sendToken" function. That way the tokens get sent to the escrow contract's address when the function is called.
-10. "npm run build" to compile the javascript and html assets into the build folder
-11. "npm run dev" to serve the assets in the build folder
+7. Run `$ compile` to create the json contract artifacts (you might have to run `$ npm install` again in that folder)
+8. Then run "truffle migrate `--reset --network development` to deploy the contracts onto the network ("development" will deploy locally to ganache)
+9. Write down the escrow contract's deployed address and copy it into the front end (index.js) to assign it to the "escrowContractAddress" variable in the "sendToken()" function. That way the tokens get sent to the escrow contract's address when the function is called.
+10. `$ npm run build` to compile the javascript and html assets into the build folder
+11. `$ npm run dev` to serve the assets in the build folder
 12. Go to the host and port that truffle is serving (default is localhost:8080) in order to see the served assets
 13. You can run the pre-written tests by running `test` from the terminal.
 
