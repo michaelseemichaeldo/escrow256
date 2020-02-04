@@ -23,6 +23,8 @@ Escrow256 is a truffle project that contains the required contracts, migration a
 
 While I have developed in the Windows environment I checked and it works in the VM using Ubuntu as well.
 
+If you don't want to run it locally you can also access the dApp via http://escrow256.com and connecting your metamask account to the ropsten test network.
+
 In order to build and run the project including the frontend code LOCALLY:
 
 1. Clone this repository to your machine to run the project on your system.
@@ -39,4 +41,3 @@ In order to build and run the project including the frontend code LOCALLY:
 12. Go to the host and port that truffle is serving (default is localhost:8080) in order to see the served assets
 13. You can run the pre-written tests by running `test` from the terminal.
 
-If you don't want to run it locally you can also access the dApp via http://escrow256.com and connecting your metamask account to the ropsten test network.
