@@ -33,7 +33,7 @@ In order to build and run the project including the frontend code LOCALLY:
 6. Start your development blockchain by running `$ truffle develop` from the terminal in the escrow256 project directory.
 7. Run `$ compile` to create the json contract artifacts (you might have to run `$ npm install` again in that folder)
 8. Then run `truffle migrate --reset --network development` to deploy the contracts onto the network ("development" will deploy locally to ganache)
-9. Write down the escrow contract's deployed address and copy it into the front end (index.js) to assign it to the "escrowContractAddress" variable in the "sendToken()" function. That way the tokens get sent to the escrow contract's address when the function is called.
+9. Copy the escrow contract's deployed address into the front end (index.js) to assign it to the "escrowContractAddress" variable in the "sendToken()" function. That way the tokens get sent to the escrow contract's address when the function is called.
 10. `$ npm run build` to compile the javascript and html assets into the build folder
 11. `$ npm run dev` to serve the assets in the build folder
 12. Go to the host and port that truffle is serving (default is localhost:8080) in order to see the served assets
