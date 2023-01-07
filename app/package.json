@@ -15,7 +15,7 @@
     "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
-    "@ensdomains/ens": "^0.4.0",
+    "@ensdomains/ens": "^0.4.5",
     "@truffle/hdwallet-provider": "^1.0.29",
     "bn.js": "^5.1.1",
     "dotenv": "^8.2.0",
